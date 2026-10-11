@@ -3,6 +3,8 @@ import adapter from '@sveltejs/adapter-node';
 import { sveltekit } from '@sveltejs/kit/vite';
 
 export default defineConfig({
+	// Shown in the footer; set when the image is built.
+	define: { __BUILD_DATE__: JSON.stringify(new Date().toISOString()) },
 	server: {
 		// Lets the dev server be opened from other devices on the tailnet.
 		allowedHosts: ['.ts.net']

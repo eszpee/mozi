@@ -13,6 +13,13 @@
 		document.documentElement.dataset.hydrated = '';
 	});
 
+	// Fixed time zone, so server and browser render the same text.
+	const buildDate = new Intl.DateTimeFormat('hu-HU', {
+		dateStyle: 'short',
+		timeStyle: 'short',
+		timeZone: 'Europe/Budapest'
+	}).format(new Date(__BUILD_DATE__));
+
 	const nav = [
 		{ href: '/', label: 'Filmek' },
 		{ href: '/watched', label: 'Láttuk már' }
@@ -63,6 +70,8 @@
 <main>
 	{@render children()}
 </main>
+
+<footer class="build">build date: {buildDate}</footer>
 
 <style>
 	.top {
@@ -179,5 +188,12 @@
 
 	main {
 		padding-bottom: 64px;
+	}
+
+	.build {
+		padding: 0 16px 20px;
+		text-align: center;
+		font-size: 11px;
+		color: #3b3a46;
 	}
 </style>
