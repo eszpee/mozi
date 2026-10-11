@@ -94,8 +94,9 @@ test.describe.serial('movie night', () => {
 		await expect(bea.getByRole('button', { name: /Fine either way \(1\)/ })).toBeVisible();
 	});
 
-	test('votes change the ranking', async () => {
+	test('votes change the ranking, but cards stay put until the page reloads', async () => {
 		await go(bea, '/');
+		const before = await bea.locator('article.movie h3').allTextContents();
 		await card(bea, 'Amélie')
 			.getByRole('button', { name: /Please no/ })
 			.click();
@@ -108,6 +109,8 @@ test.describe.serial('movie night', () => {
 		await expect(
 			card(bea, 'Kontroll').getByRole('button', { name: /Want to watch \(2\)/ })
 		).toBeVisible();
+		// No jumping around while voting.
+		expect(await bea.locator('article.movie h3').allTextContents()).toEqual(before);
 
 		await go(bea, '/');
 		const titles = await bea.locator('article.movie h3').allTextContents();

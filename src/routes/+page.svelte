@@ -2,9 +2,41 @@
 	import { page } from '$app/state';
 	import MovieCard from '#lib/components/MovieCard.svelte';
 	import NightStrip from '#lib/components/NightStrip.svelte';
-	import { SORTS, type SortKey } from '#lib/scoring.ts';
+	import { flip } from 'svelte/animate';
+	import { SORTS, rank, type SortKey } from '#lib/scoring.ts';
+	import { stableOrder } from '#lib/stable-order.ts';
 
 	let { data } = $props();
+
+	/** The current ranking, filtered — what a fresh page load would show. */
+	let fresh = $derived.by(() => {
+		let movies = data.movies;
+		if (data.needsVote) movies = movies.filter((m) => m.myVote === null);
+		if (data.inPlex) movies = movies.filter((m) => m.availability === 'plex');
+		return rank(
+			movies.map((m) => ({ movie: m, tally: m.rankTally, addedAt: m.addedAt })),
+			data.sort
+		).map((r) => r.movie);
+	});
+
+	// Votes refresh the data, but cards keep their place until the view changes
+	// (sort, scope, filter) or the page is loaded again.
+	let viewKey = $derived(`${data.sort}|${data.scope}|${data.needsVote}|${data.inPlex}`);
+	let memory = { ids: [] as number[], key: '' };
+	let order = $derived.by(() => {
+		const freshIds = fresh.map((m) => m.id);
+		if (memory.key !== viewKey) {
+			memory = { ids: freshIds, key: viewKey };
+		} else {
+			const existing = new Set(data.movies.map((m) => m.id));
+			memory = { ...memory, ids: stableOrder(memory.ids, freshIds, existing) };
+		}
+		return memory.ids;
+	});
+	let byId = $derived(new Map(data.movies.map((m) => [m.id, m])));
+	let shown = $derived(order.map((id) => byId.get(id)!));
+	let unvoted = $derived(data.movies.filter((m) => m.myVote === null).length);
+	let total = $derived(data.movies.length);
 
 	/** Builds a link to this page with one query parameter changed. */
 	function withParam(name: string, value: string | null) {
@@ -23,7 +55,7 @@
 <div class="wrap page">
 	<NightStrip night={data.night} members={data.members} />
 
-	{#if data.total > 0}
+	{#if total > 0}
 		<div class="controls">
 			<div class="row">
 				<div class="segmented" role="group" aria-label="Whose votes count">
@@ -48,7 +80,7 @@
 						data-sveltekit-reset="false"
 						data-sveltekit-replacestate
 					>
-						Needs my vote{#if data.unvoted}<span class="count">{data.unvoted}</span>{/if}
+						Needs my vote{#if unvoted}<span class="count">{unvoted}</span>{/if}
 					</a>
 					<a
 						class="chip"
@@ -75,13 +107,15 @@
 		</div>
 	{/if}
 
-	{#if data.movies.length}
+	{#if shown.length}
 		<div class="grid">
-			{#each data.movies as movie, i (movie.id)}
-				<MovieCard {movie} rank={rankShown ? i + 1 : null} eager={i < 4} />
+			{#each shown as movie, i (movie.id)}
+				<div class="cell" animate:flip={{ duration: 350 }}>
+					<MovieCard {movie} rank={rankShown ? i + 1 : null} eager={i < 4} />
+				</div>
 			{/each}
 		</div>
-	{:else if data.total === 0}
+	{:else if total === 0}
 		<div class="empty card">
 			<p class="big">🍿</p>
 			<h2>No picks yet</h2>
@@ -230,6 +264,10 @@
 		.grid {
 			grid-template-columns: repeat(5, minmax(0, 1fr));
 		}
+	}
+
+	.cell {
+		min-width: 0;
 	}
 
 	.empty {

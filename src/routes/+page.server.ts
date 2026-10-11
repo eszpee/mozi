@@ -2,7 +2,7 @@ import { activeMovies } from '#lib/server/movies.ts';
 import { attendeeIds, openNight } from '#lib/server/nights.ts';
 import { activeMembers, toMember } from '#lib/server/users.ts';
 import { attend, vote } from '#lib/server/actions.ts';
-import { isSortKey, rank } from '#lib/scoring.ts';
+import { isSortKey } from '#lib/scoring.ts';
 
 export function load({ locals, url }) {
 	const me = locals.user!;
@@ -17,20 +17,10 @@ export function load({ locals, url }) {
 	// With nobody marked as attending yet, the night scope falls back to everyone.
 	const voters = scope === 'night' && attendees.size > 0 ? attendees : undefined;
 
-	let movies = activeMovies(me.id, voters);
-	const total = movies.length;
-	if (needsVote) movies = movies.filter((m) => m.myVote === null);
-	if (inPlex) movies = movies.filter((m) => m.availability === 'plex');
-
-	const ranked = rank(
-		movies.map((m) => ({ movie: m, tally: m.rankTally, addedAt: m.addedAt })),
-		sort
-	).map((r) => r.movie);
-
+	// Filtering and ranking happen in the page, so it can keep the order stable
+	// while people vote (see stable-order.ts).
 	return {
-		movies: ranked,
-		total,
-		unvoted: activeMovies(me.id).filter((m) => m.myVote === null).length,
+		movies: activeMovies(me.id, voters),
 		sort,
 		scope,
 		needsVote,
