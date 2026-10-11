@@ -6,20 +6,37 @@
 
 	let { data, form } = $props();
 
-	let seed = $derived((form && 'avatarSeed' in form && form.avatarSeed) || data.avatarSeed);
-	// Local state, so rerolling the avatar (a separate form) keeps what was typed.
+	// Both are drafts until saved: a new avatar is only a preview, so leaving the
+	// page keeps the old one.
 	let nickname = $state(untrack(() => data.nickname));
+	let seed = $state(untrack(() => data.avatarSeed));
+
+	/** A random seed in the same shape as the server's (base64url). */
+	function reroll() {
+		const bytes = crypto.getRandomValues(new Uint8Array(9));
+		seed = btoa(String.fromCharCode(...bytes))
+			.replaceAll('+', '-')
+			.replaceAll('/', '_');
+	}
 </script>
 
 <svelte:head><title>Üdv · mozi</title></svelte:head>
 
 <Splash>
 	<h1>{data.firstTime ? 'Üdv!' : 'Te'}</h1>
-	<form method="POST" action="?/reroll" use:enhance class="avatar-row">
+	<div class="avatar-row">
 		<Avatar {seed} size={96} />
-		<button class="btn btn-small" type="submit">🎲 Másik avatár</button>
-	</form>
-	<form method="POST" action="?/save" class="name">
+		<button class="btn btn-small" type="button" onclick={reroll}>🎲 Másik avatár</button>
+	</div>
+	<form
+		method="POST"
+		action="?/save"
+		class="name"
+		use:enhance={() =>
+			async ({ update }) =>
+				update({ reset: false })}
+	>
+		<input type="hidden" name="avatarSeed" value={seed} />
 		<label for="nickname" class="muted">Hogy szólítson a csapat?</label>
 		<!-- svelte-ignore a11y_autofocus -->
 		<input
@@ -34,6 +51,7 @@
 		/>
 		{#if form && 'error' in form}<p class="error-text" role="alert">{form.error}</p>{/if}
 		<button class="btn btn-primary" type="submit">{data.firstTime ? 'Mehet' : 'Mentés'}</button>
+		{#if !data.firstTime}<a class="btn btn-ghost" href="/">Mégse</a>{/if}
 	</form>
 </Splash>
 

@@ -41,6 +41,9 @@ export function avatarParts(seed: string) {
 
 export const AVATAR_COUNT = EMOJI.length * COLORS.length;
 
+/** Valid seeds; also the avatar route's URL check. */
+export const AVATAR_SEED = /^[A-Za-z0-9_-]{1,32}$/;
+
 export function avatarSvg(seed: string): string {
 	const { emoji, color } = avatarParts(seed);
 	return (

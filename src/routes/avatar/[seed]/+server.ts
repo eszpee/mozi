@@ -1,8 +1,8 @@
 import { error } from '@sveltejs/kit';
-import { avatarSvg } from '#lib/server/avatar.ts';
+import { AVATAR_SEED, avatarSvg } from '#lib/server/avatar.ts';
 
 export function GET({ params }) {
-	if (!/^[A-Za-z0-9_-]{1,32}$/.test(params.seed)) error(404, 'Nincs ilyen oldal');
+	if (!AVATAR_SEED.test(params.seed)) error(404, 'Nincs ilyen oldal');
 	return new Response(avatarSvg(params.seed), {
 		headers: {
 			'content-type': 'image/svg+xml',
