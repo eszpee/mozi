@@ -53,6 +53,20 @@ test.describe.serial('movie night', () => {
 		await expect(page.getByRole('heading', { name: /You’re invited/ })).toBeVisible();
 	});
 
+	test('a new avatar keeps the typed nickname', async ({ browser }) => {
+		const context = await browser.newContext();
+		const page = await context.newPage();
+		await go(page, '/dev/login?as=reroller');
+		const nickname = page.getByLabel('What should the crew call you?');
+		await nickname.fill('Rolly');
+		const avatar = page.locator('.avatar-row img');
+		const before = await avatar.getAttribute('src');
+		await page.getByRole('button', { name: /New avatar/ }).click();
+		await expect(avatar).not.toHaveAttribute('src', before!);
+		await expect(nickname).toHaveValue('Rolly');
+		await context.close();
+	});
+
 	test('nicknames must be unique', async ({ browser }) => {
 		const context = await browser.newContext();
 		const page = await context.newPage();

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import { enhance } from '$app/forms';
 	import Splash from '#lib/components/Splash.svelte';
 	import Avatar from '#lib/components/Avatar.svelte';
@@ -6,6 +7,8 @@
 	let { data, form } = $props();
 
 	let seed = $derived((form && 'avatarSeed' in form && form.avatarSeed) || data.avatarSeed);
+	// Local state, so rerolling the avatar (a separate form) keeps what was typed.
+	let nickname = $state(untrack(() => data.nickname));
 </script>
 
 <svelte:head><title>Welcome · mozi</title></svelte:head>
@@ -27,7 +30,7 @@
 			required
 			autocomplete="nickname"
 			autofocus={data.firstTime}
-			value={form && 'error' in form ? '' : data.nickname}
+			bind:value={nickname}
 		/>
 		{#if form && 'error' in form}<p class="error-text" role="alert">{form.error}</p>{/if}
 		<button class="btn btn-primary" type="submit">{data.firstTime ? 'Let’s go' : 'Save'}</button>

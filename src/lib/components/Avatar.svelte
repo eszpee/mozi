@@ -10,7 +10,7 @@
 <img
 	class="avatar"
 	class:dim
-	src="/avatar/{seed}"
+	src="/avatar/{seed}?v=2"
 	alt={name}
 	title={name}
 	width={size}

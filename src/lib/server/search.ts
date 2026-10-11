@@ -5,12 +5,16 @@ import { availabilityMap } from '#lib/server/arr.ts';
 
 export type SearchHit = Awaited<ReturnType<typeof search>>[number];
 
-/** TMDB search decorated with what the group already has (listed, watched, in Plex). */
+/**
+ * TMDB search decorated with what the group already has (listed, watched, in Plex).
+ * Movies already in Plex, downloading or requested come first; TMDB's relevance
+ * order is kept otherwise.
+ */
 export async function search(query: string) {
 	const q = query.trim().slice(0, 100);
 	if (q.length < 2) return [];
 	const [results, existing, avail] = [await searchMovies(q), existingTmdbIds(), availabilityMap()];
-	return results.map((r) => {
+	const hits = results.map((r) => {
 		const listed = existing.get(r.tmdbId);
 		return {
 			tmdbId: r.tmdbId,
@@ -22,4 +26,5 @@ export async function search(query: string) {
 			watched: listed?.watched ?? false
 		};
 	});
+	return hits.filter((h) => h.availability).concat(hits.filter((h) => !h.availability));
 }
