@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { asc, eq } from 'drizzle-orm';
+import { asc, eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db, schema } from '#lib/server/db/index.ts';
 import { currentInvite, rotateInvite } from '#lib/server/auth/invites.ts';
@@ -12,9 +12,22 @@ function requireAdmin(locals: App.Locals) {
 	if (!locals.admin) error(404, 'Nincs ilyen oldal');
 }
 
+/** Each member's latest vote, recommendation, comment or own "seen" mark (ms). */
+function lastActions(): Map<number, number> {
+	const rows = db.all<{ userId: number; at: number }>(sql`
+		SELECT user_id AS userId, MAX(at) AS at FROM (
+			SELECT user_id, updated_at AS at FROM votes
+			UNION ALL SELECT added_by, added_at FROM movies
+			UNION ALL SELECT user_id, COALESCE(edited_at, created_at) FROM comments
+			UNION ALL SELECT user_id, created_at FROM seen WHERE source = 'self'
+		) GROUP BY user_id`);
+	return new Map(rows.map((r) => [r.userId, r.at]));
+}
+
 export function load({ locals, url }) {
 	requireAdmin(locals);
 	const invite = currentInvite();
+	const last = lastActions();
 	const members = db
 		.select()
 		.from(schema.users)
@@ -22,10 +35,11 @@ export function load({ locals, url }) {
 		.all()
 		.map((u) => ({
 			id: u.id,
-			nickname: u.nickname ?? '(no name yet)',
+			nickname: u.nickname ?? '(még nincs neve)',
 			email: u.email,
 			avatarSeed: u.avatarSeed,
 			joined: u.createdAt.getTime(),
+			lastAction: last.get(u.id) ?? null,
 			removed: !!u.removedAt,
 			me: u.id === locals.user!.id
 		}));

@@ -61,9 +61,9 @@
 					<div class="who">
 						<strong>{m.nickname}</strong>
 						<span class="faint small"
-							>{m.email} · csatlakozott: {formatDate(m.joined)}{m.removed
-								? ' · eltávolítva'
-								: ''}</span
+							>{m.email} · csatlakozott: {formatDate(m.joined)} · utolsó művelet: {m.lastAction
+								? timeAgo(m.lastAction)
+								: 'még semmi'}{m.removed ? ' · eltávolítva' : ''}</span
 						>
 					</div>
 					{#if !m.me && !m.removed}

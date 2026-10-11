@@ -252,6 +252,10 @@ test.describe.serial('movie night', () => {
 		await expect(card(admin, 'Dune: Part Two')).toHaveCount(0);
 
 		await go(admin, '/admin');
+		// Bea voted and commented earlier.
+		await expect(admin.locator('.members li').filter({ hasText: 'Bea' })).toContainText(
+			/utolsó művelet: (épp most|\d+ perce)/
+		);
 		const row = admin.locator('.members li').filter({ hasText: 'Bea' });
 		await row.getByRole('button', { name: '⋯' }).click();
 		await row.getByRole('button', { name: 'Eltávolítás' }).click();
