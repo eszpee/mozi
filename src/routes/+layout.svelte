@@ -56,7 +56,7 @@
 				</summary>
 				<div class="menu card">
 					<p class="who">{data.me.nickname}</p>
-					<a href="/welcome">Név és avatár</a>
+					<a href="/welcome">Név és kép</a>
 					{#if data.me.admin}<a href="/admin">Admin</a>{/if}
 					<form method="POST" action="/auth/logout">
 						<button type="submit">Kijelentkezés</button>
