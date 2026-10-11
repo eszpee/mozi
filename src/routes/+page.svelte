@@ -15,7 +15,12 @@
 		if (data.needsVote) movies = movies.filter((m) => m.myVote === null);
 		if (data.inPlex) movies = movies.filter((m) => m.availability === 'plex');
 		return rank(
-			movies.map((m) => ({ movie: m, tally: m.rankTally, addedAt: m.addedAt })),
+			movies.map((m) => ({
+				movie: m,
+				tally: m.rankTally,
+				addedAt: m.addedAt,
+				rating: m.rating
+			})),
 			data.sort
 		).map((r) => r.movie);
 	});

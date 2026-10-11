@@ -47,6 +47,16 @@ describe('rank', () => {
 		expect(names(rank([a, b, c, d], 'controversial'))).toEqual(['c', 'a', 'b', 'd']);
 	});
 
+	it('highest rated sorts by TMDB rating, unrated last', () => {
+		const rated = [
+			{ ...a, rating: 6.1 },
+			{ ...b, rating: null },
+			{ ...c, rating: 8.4 },
+			{ ...d, rating: 7 }
+		];
+		expect(names(rank(rated, 'rated'))).toEqual(['c', 'd', 'a', 'b']);
+	});
+
 	it('newest sorts by date added', () => {
 		expect(names(rank([a, b, c, d], 'newest'))).toEqual(['d', 'c', 'b', 'a']);
 	});
