@@ -7,8 +7,10 @@ services:
     image: mozi:local
     container_name: mozi
     restart: unless-stopped
-    ports:
-      - '3010:3000'
+    # No published port: the reverse proxy reaches the app over a shared network,
+    # so nothing can bypass the proxy (and spoof CF-Connecting-IP).
+    networks:
+      - frontend
     environment:
       - TZ=Europe/Budapest
       # Cloudflare sets the real client address; nginx passes it through.
