@@ -112,14 +112,6 @@
 					</div>
 				{/if}
 			{/each}
-			{#if movie.providers.stream.length || movie.providers.rent.length}
-				<a
-					class="justwatch"
-					href={movie.providers.link ?? 'https://www.justwatch.com/hu'}
-					target="_blank"
-					rel="noopener noreferrer">Forrás: JustWatch</a
-				>
-			{/if}
 			{#if movie.rating}<p class="rating">★ {movie.rating.toFixed(1)} <span>TMDB</span></p>{/if}
 			<div class="links">
 				{#if movie.imdbId}
@@ -455,12 +447,6 @@
 	.providers img {
 		border-radius: 7px;
 		background: var(--surface);
-	}
-
-	.justwatch {
-		font-size: 11px;
-		color: var(--text-faint);
-		text-decoration: none;
 	}
 
 	.rating {

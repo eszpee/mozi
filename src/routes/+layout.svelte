@@ -78,7 +78,11 @@
 	{@render children()}
 </main>
 
-<footer class="build">build date: {buildDate}</footer>
+<footer class="build">
+	build date: {buildDate} · Adatok:
+	<a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer">TMDB</a>,
+	<a href="https://www.justwatch.com/hu" target="_blank" rel="noopener noreferrer">JustWatch</a>
+</footer>
 
 <style>
 	.top {
@@ -202,5 +206,9 @@
 		text-align: center;
 		font-size: 11px;
 		color: #3b3a46;
+	}
+
+	.build a {
+		color: inherit;
 	}
 </style>
