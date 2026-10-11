@@ -69,22 +69,22 @@
 				<p class="details">Főszereplők: {movie.cast.join(', ')}</p>
 			{/if}
 			{#if movie.rating}<p class="rating">★ {movie.rating.toFixed(1)} <span>TMDB</span></p>{/if}
-		</div>
-		<div class="links">
-			{#if movie.imdbId}
+			<div class="links">
+				{#if movie.imdbId}
+					<a
+						class="btn btn-small"
+						href="https://www.imdb.com/title/{movie.imdbId}/"
+						target="_blank"
+						rel="noopener noreferrer">IMDb ↗</a
+					>
+				{/if}
 				<a
 					class="btn btn-small"
-					href="https://www.imdb.com/title/{movie.imdbId}/"
+					href={trailerUrl(movie.trailerKey, movie.title.main, movie.year)}
 					target="_blank"
-					rel="noopener noreferrer">IMDb ↗</a
+					rel="noopener noreferrer">▶ Előzetes</a
 				>
-			{/if}
-			<a
-				class="btn btn-small"
-				href={trailerUrl(movie.trailerKey, movie.title.main, movie.year)}
-				target="_blank"
-				rel="noopener noreferrer">▶ Előzetes</a
-			>
+			</div>
 		</div>
 	</div>
 </div>
@@ -391,10 +391,10 @@
 	}
 
 	.links {
-		grid-column: 1 / -1;
 		display: flex;
 		flex-wrap: wrap;
 		gap: 8px;
+		margin-top: 6px;
 	}
 
 	.body {
