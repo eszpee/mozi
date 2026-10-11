@@ -54,6 +54,14 @@ describe('rank', () => {
 		]);
 	});
 
+	it('best bet pulls down movies people have already seen', () => {
+		const fresh = item('fresh', votes(1, 1), 1);
+		const seen = { ...item('seen', votes(1, 1), 2), seen: 1 };
+		const liked = { ...item('liked', votes(1, 1, 1), 3), seen: 2 };
+		// 2 vs 1.5 vs 3 − 1 = 2: a third 👍 makes up for two people having seen it (more 👍 wins the tie).
+		expect(names(rank([seen, fresh, liked], 'best'))).toEqual(['liked', 'fresh', 'seen']);
+	});
+
 	it('most liked sorts by thumbs-up, fewer thumbs-down first on ties', () => {
 		expect(names(rank([a, b, c, d], 'liked'))).toEqual(['a', 'b', 'c', 'd']);
 	});

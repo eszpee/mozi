@@ -34,6 +34,8 @@ export type MovieView = {
 	rankTally: Tally;
 	myVote: VoteValue | null;
 	seenBy: Member[];
+	/** How many of the ranking scope's people have seen it; used by "best bet". */
+	rankSeen: number;
 	mySeen: boolean;
 	commentCount: number;
 	availability: AvailabilityStatus | null;
@@ -101,6 +103,8 @@ function buildViews(rows: Movie[], meId: number, voters?: ReadonlySet<number>): 
 			rankTally: tally(active, voters),
 			myVote: mv.find((v) => v.userId === meId)?.value ?? null,
 			seenBy: ms.map((s) => member(s.userId)).filter((x) => !x.removed),
+			rankSeen: ms.filter((s) => !member(s.userId).removed && (!voters || voters.has(s.userId)))
+				.length,
 			mySeen: ms.some((s) => s.userId === meId),
 			commentCount: commentCounts.get(m.id) ?? 0,
 			availability: avail.get(m.tmdbId) ?? null

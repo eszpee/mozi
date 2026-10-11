@@ -20,6 +20,7 @@
 				tally: m.rankTally,
 				addedAt: m.addedAt,
 				rating: m.rating,
+				seen: m.rankSeen,
 				released: m.releaseDate ?? (m.year ? String(m.year) : null)
 			})),
 			data.sort
