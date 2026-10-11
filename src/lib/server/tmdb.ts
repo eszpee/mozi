@@ -131,6 +131,7 @@ export async function fetchMovieMeta(tmdbId: number): Promise<MovieMeta> {
 		year: yearOf(d.release_date),
 		runtime: d.runtime || null,
 		genres: d.genres.map((g) => g.name),
+		// Hungarian films read in Hungarian (title and overview); everything else in English.
 		overview: (isHungarian && hu?.data.overview) || d.overview || '',
 		posterPath: huPoster ?? d.poster_path,
 		rating: d.vote_count > 0 ? Math.round(d.vote_average * 10) / 10 : null,

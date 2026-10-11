@@ -68,7 +68,7 @@ test.describe.serial('movie night', () => {
 		await expect(admin.getByRole('heading', { name: 'No picks yet' })).toBeVisible();
 		await recommend(admin, 'amel', /Amélie/);
 		await expect(admin.getByRole('heading', { name: 'Amélie', level: 1 })).toBeVisible();
-		await expect(admin.getByText('Le Fabuleux Destin d’Amélie Poulain')).toBeVisible();
+		await expect(admin.getByText("Le Fabuleux Destin d'Amélie Poulain")).toBeVisible();
 		await expect(admin.getByRole('button', { name: /Want to watch \(1\)/ })).toHaveAttribute(
 			'aria-pressed',
 			'true'
@@ -82,6 +82,16 @@ test.describe.serial('movie night', () => {
 		const kontroll = card(admin, 'Kontroll');
 		await expect(kontroll).toBeVisible();
 		await expect(kontroll.locator('.original')).toHaveCount(0);
+	});
+
+	test('Hungarian films never show the English title', async () => {
+		await recommend(bea, 'saul', /Saul fia/);
+		await expect(bea.getByRole('heading', { name: 'Saul fia', level: 1 })).toBeVisible();
+		await expect(bea.getByText('Son of Saul')).toHaveCount(0);
+		// Their overview is Hungarian too.
+		await expect(bea.getByText(/Auschwitz-Birkenau/)).toBeVisible();
+		await bea.getByRole('button', { name: /Fine either way/ }).click();
+		await expect(bea.getByRole('button', { name: /Fine either way \(1\)/ })).toBeVisible();
 	});
 
 	test('votes change the ranking', async () => {
@@ -110,7 +120,7 @@ test.describe.serial('movie night', () => {
 
 	test('"needs my vote" lists what I have not voted on', async () => {
 		await go(admin, '/?needs-vote');
-		await expect(admin.locator('article.movie h3')).toHaveText(['Dune: Part Two']);
+		await expect(admin.locator('article.movie h3')).toHaveText(['Dune: Part Two', 'Saul fia']);
 	});
 
 	test('next-night scope only counts attendees', async () => {

@@ -15,7 +15,7 @@
 		<ul class="list">
 			{#each data.movies as m (m.id)}
 				<li class="item">
-					<a class="thumb" href="/movie/{m.id}">
+					<a class="thumb" href="/movie/{m.id}" tabindex="-1" aria-hidden="true">
 						<Poster path={m.posterPath} title={m.title.main} sizes="72px" />
 					</a>
 					<div class="info">
