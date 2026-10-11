@@ -21,14 +21,14 @@
 	<h1>Admin</h1>
 
 	<section class="card block">
-		<h2>Invite link</h2>
+		<h2>Meghívólink</h2>
 		<p class="muted">
-			Anyone with this link can join with their Google account. Rotate it if it leaks.
+			Ezzel a linkkel bárki csatlakozhat a Google-fiókjával. Ha kiszivárog, cseréld le.
 		</p>
 		<div class="invite">
-			<input class="input" readonly value={data.inviteUrl} aria-label="Invite link" />
+			<input class="input" readonly value={data.inviteUrl} aria-label="Meghívólink" />
 			<button class="btn btn-small btn-primary" type="button" onclick={copy}
-				>{copied ? 'Copied ✓' : 'Copy'}</button
+				>{copied ? 'Másolva ✓' : 'Másolás'}</button
 			>
 		</div>
 		{#if confirmRotate}
@@ -42,18 +42,18 @@
 					}}
 				class="row"
 			>
-				<span class="muted small">The old link stops working immediately.</span>
-				<button class="btn btn-small" type="submit">Rotate now</button>
+				<span class="muted small">A régi link azonnal megszűnik.</span>
+				<button class="btn btn-small" type="submit">Csere most</button>
 			</form>
 		{:else}
 			<button class="btn btn-small btn-ghost" type="button" onclick={() => (confirmRotate = true)}
-				>Rotate link…</button
+				>Link cseréje…</button
 			>
 		{/if}
 	</section>
 
 	<section class="card block">
-		<h2>Members</h2>
+		<h2>Tagok</h2>
 		<ul class="members">
 			{#each data.members as m (m.id)}
 				<li class:removed={m.removed}>
@@ -61,14 +61,16 @@
 					<div class="who">
 						<strong>{m.nickname}</strong>
 						<span class="faint small"
-							>{m.email} · joined {formatDate(m.joined)}{m.removed ? ' · removed' : ''}</span
+							>{m.email} · csatlakozott: {formatDate(m.joined)}{m.removed
+								? ' · eltávolítva'
+								: ''}</span
 						>
 					</div>
 					{#if !m.me && !m.removed}
 						{#if confirmRemove === m.id}
 							<form method="POST" action="?/remove" use:enhance>
 								<input type="hidden" name="userId" value={m.id} />
-								<button class="btn btn-small danger" type="submit">Remove</button>
+								<button class="btn btn-small danger" type="submit">Eltávolítás</button>
 							</form>
 						{:else}
 							<button
@@ -82,27 +84,27 @@
 			{/each}
 		</ul>
 		<p class="faint small">
-			Removed members are signed out; their votes stop counting and their comments show as “former
-			member”. They can rejoin with the invite link.
+			Az eltávolított tagok ki lesznek léptetve, a szavazatuk nem számít, a hozzászólásaik „volt
+			tag” néven látszanak. A meghívólinkkel visszatérhetnek.
 		</p>
 	</section>
 
 	<section class="card block">
 		<h2>Plex &amp; Radarr</h2>
 		<p class="muted">
-			{data.availabilityCount} movies known.
+			{data.availabilityCount} ismert film.
 			{#if data.sync}
-				Last sync {timeAgo(data.sync.at)}{data.sync.error ? ' — failed' : ''}.
+				Utolsó szinkron: {timeAgo(data.sync.at)}{data.sync.error ? ' — sikertelen' : ''}.
 			{:else}
-				Not synced since start.
+				Indulás óta nem volt szinkron.
 			{/if}
 		</p>
 		{#if data.sync?.error}<p class="error-text small">{data.sync.error}</p>{/if}
 		<form method="POST" action="?/sync" use:enhance>
-			<button class="btn btn-small" type="submit">Sync now</button>
+			<button class="btn btn-small" type="submit">Szinkron most</button>
 		</form>
 		{#if !data.tmdb}<p class="error-text small">
-				TMDB token is not configured: search won’t work.
+				Nincs beállítva TMDB token, így a keresés nem működik.
 			</p>{/if}
 	</section>
 </div>

@@ -14,19 +14,19 @@
 
 	let attending = $derived(new Set(night.attendees));
 	let heading = $derived(
-		[night.label, formatNightDate(night.date)].filter(Boolean).join(' · ') || 'Date to be decided'
+		[night.label, formatNightDate(night.date)].filter(Boolean).join(' · ') || 'Időpont még nincs'
 	);
 </script>
 
-<section class="night card" aria-label="Next movie night">
+<section class="night card" aria-label="Következő mozis este">
 	<div class="head">
 		<div>
-			<p class="eyebrow">Next movie night</p>
+			<p class="eyebrow">Következő mozis este</p>
 			<h2>{heading}</h2>
 		</div>
-		<a class="btn btn-small btn-ghost" href="/night">Edit</a>
+		<a class="btn btn-small btn-ghost" href="/night">Szerkesztés</a>
 	</div>
-	<p class="hint">Who’s coming? Tap to toggle.</p>
+	<p class="hint">Ki jön? Koppints a nevekre.</p>
 	<ul class="people">
 		{#each members as m (m.id)}
 			{@const on = attending.has(m.id)}

@@ -7,10 +7,10 @@
 	let confirmUndo: number | null = $state(null);
 </script>
 
-<svelte:head><title>Watched · mozi</title></svelte:head>
+<svelte:head><title>Megnéztük · mozi</title></svelte:head>
 
 <div class="wrap page">
-	<h1>Watched together</h1>
+	<h1>Együtt néztük</h1>
 	{#if data.movies.length}
 		<ul class="list">
 			{#each data.movies as m (m.id)}
@@ -32,7 +32,7 @@
 						{#if confirmUndo === m.id}
 							<form method="POST" action="?/undo" use:enhance>
 								<input type="hidden" name="movieId" value={m.id} />
-								<button class="btn btn-small" type="submit">Undo</button>
+								<button class="btn btn-small" type="submit">Visszavonás</button>
 							</form>
 						{:else}
 							<button
@@ -50,7 +50,8 @@
 	{:else}
 		<div class="empty card">
 			<p class="muted">
-				Nothing watched yet. When the group watches a pick, open it and tap “We watched it”.
+				Még nem néztetek meg semmit. Ha a csapat megnéz egy filmet, nyisd meg, és koppints a
+				„Megnéztük” gombra.
 			</p>
 		</div>
 	{/if}

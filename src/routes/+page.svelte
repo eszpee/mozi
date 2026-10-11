@@ -71,7 +71,7 @@
 	let rankShown = $derived(data.sort !== 'added');
 </script>
 
-<svelte:head><title>Picks · mozi</title></svelte:head>
+<svelte:head><title>Filmek · mozi</title></svelte:head>
 
 <div class="wrap page">
 	<NightStrip night={data.night} members={data.members} />
@@ -79,18 +79,18 @@
 	{#if total > 0}
 		<div class="controls">
 			<div class="row">
-				<div class="segmented" role="group" aria-label="Whose votes count">
+				<div class="segmented" role="group" aria-label="Kinek a szavazata számít">
 					<a
 						href={withParam('scope', null)}
 						aria-current={data.scope === 'everyone' ? 'true' : undefined}
 						data-sveltekit-reset="false"
-						data-sveltekit-replacestate>Everyone</a
+						data-sveltekit-replacestate>Mindenki</a
 					>
 					<a
 						href={withParam('scope', 'night')}
 						aria-current={data.scope === 'night' ? 'true' : undefined}
 						data-sveltekit-reset="false"
-						data-sveltekit-replacestate>Next night</a
+						data-sveltekit-replacestate>Következő este</a
 					>
 				</div>
 				<div class="filters">
@@ -101,19 +101,19 @@
 						data-sveltekit-reset="false"
 						data-sveltekit-replacestate
 					>
-						Needs my vote{#if unvoted}<span class="count">{unvoted}</span>{/if}
+						Még nem szavaztam{#if unvoted}<span class="count">{unvoted}</span>{/if}
 					</a>
 					<a
 						class="chip"
 						href={withParam('plex', data.inPlex ? null : '')}
 						aria-current={data.inPlex ? 'true' : undefined}
 						data-sveltekit-reset="false"
-						data-sveltekit-replacestate>▶ In Plex</a
+						data-sveltekit-replacestate>▶ Plexben</a
 					>
 				</div>
 			</div>
 			<div class="sort-row">
-				<nav class="sorts" aria-label="Sort">
+				<nav class="sorts" aria-label="Rendezés">
 					{#each sortKeys as key (key)}
 						<a
 							href={withParam('sort', key === 'best' ? null : key)}
@@ -128,8 +128,8 @@
 					class:spin={refreshing}
 					type="button"
 					onclick={refresh}
-					aria-label="Refresh"
-					title="Refresh"
+					aria-label="Frissítés"
+					title="Frissítés"
 				>
 					<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
 						<path
@@ -144,7 +144,7 @@
 				</button>
 			</div>
 			{#if data.scope === 'night' && data.night.attendees.length === 0}
-				<p class="note">Nobody’s marked as coming yet, so everyone’s votes count.</p>
+				<p class="note">Még senki nem jelezte, hogy jön, így mindenki szavazata számít.</p>
 			{/if}
 		</div>
 	{/if}
@@ -160,15 +160,15 @@
 	{:else if total === 0}
 		<div class="empty card">
 			<p class="big">🍿</p>
-			<h2>No picks yet</h2>
-			<p class="muted">Recommend the first movie and the voting can begin.</p>
-			<a class="btn btn-primary" href="/add">Recommend a movie</a>
+			<h2>Még nincs ajánlott film</h2>
+			<p class="muted">Ajánld az első filmet, és kezdődhet a szavazás.</p>
+			<a class="btn btn-primary" href="/add">Film ajánlása</a>
 		</div>
 	{:else}
 		<div class="empty card">
-			<h2>Nothing matches</h2>
+			<h2>Nincs találat</h2>
 			<p class="muted">
-				{data.needsVote ? 'You’ve voted on everything. Nice.' : 'Try turning a filter off.'}
+				{data.needsVote ? 'Mindenre szavaztál. Szép!' : 'Próbálj kikapcsolni egy szűrőt.'}
 			</p>
 		</div>
 	{/if}

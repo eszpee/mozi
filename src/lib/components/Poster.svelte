@@ -15,7 +15,7 @@
 			src={posterUrl(path, 342)}
 			srcset="{posterUrl(path, 185)} 185w, {posterUrl(path, 342)} 342w, {posterUrl(path, 500)} 500w"
 			{sizes}
-			alt="Poster of {title}"
+			alt="{title} plakátja"
 			loading={eager ? 'eager' : 'lazy'}
 			decoding="async"
 		/>

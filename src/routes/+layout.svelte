@@ -14,8 +14,8 @@
 	});
 
 	const nav = [
-		{ href: '/', label: 'Picks' },
-		{ href: '/watched', label: 'Watched' }
+		{ href: '/', label: 'Filmek' },
+		{ href: '/watched', label: 'Megnéztük' }
 	];
 </script>
 
@@ -32,7 +32,7 @@
 {#if data.me}
 	<header class="top">
 		<div class="wrap bar">
-			<a href="/" class="logo" aria-label="mozi home">mozi<span>.</span></a>
+			<a href="/" class="logo" aria-label="mozi kezdőlap">mozi<span>.</span></a>
 			<nav>
 				{#each nav as item (item.href)}
 					<a href={item.href} aria-current={page.url.pathname === item.href ? 'page' : undefined}>
@@ -40,19 +40,19 @@
 					</a>
 				{/each}
 			</nav>
-			<a class="btn btn-primary btn-small add" href="/add" aria-label="Recommend a movie">
-				<span aria-hidden="true">＋</span><span class="add-label">Recommend</span>
+			<a class="btn btn-primary btn-small add" href="/add" aria-label="Film ajánlása">
+				<span aria-hidden="true">＋</span><span class="add-label">Ajánlok</span>
 			</a>
 			<details class="me">
-				<summary aria-label="Account menu">
+				<summary aria-label="Fiókmenü">
 					<Avatar seed={data.me.avatarSeed} name={data.me.nickname} size={34} />
 				</summary>
 				<div class="menu card">
 					<p class="who">{data.me.nickname}</p>
-					<a href="/welcome">Change name / avatar</a>
+					<a href="/welcome">Név és avatár</a>
 					{#if data.me.admin}<a href="/admin">Admin</a>{/if}
 					<form method="POST" action="/auth/logout">
-						<button type="submit">Sign out</button>
+						<button type="submit">Kijelentkezés</button>
 					</form>
 				</div>
 			</details>

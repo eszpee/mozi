@@ -6,6 +6,6 @@ export async function GET({ url }) {
 		return Response.json(hits, { headers: { 'cache-control': 'private, max-age=60' } });
 	} catch (e) {
 		console.error('Search failed', e);
-		return Response.json({ error: 'Search is unavailable right now' }, { status: 502 });
+		return Response.json({ error: 'A keresés most nem elérhető' }, { status: 502 });
 	}
 }

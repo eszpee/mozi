@@ -9,7 +9,7 @@ import { parseForm } from '#lib/server/actions.ts';
 import { tmdbConfigured } from '#lib/server/tmdb.ts';
 
 function requireAdmin(locals: App.Locals) {
-	if (!locals.admin) error(404, 'Not found');
+	if (!locals.admin) error(404, 'Nincs ilyen oldal');
 }
 
 export function load({ locals, url }) {
@@ -46,7 +46,7 @@ export const actions = {
 	remove: async ({ request, locals }) => {
 		requireAdmin(locals);
 		const { userId } = await parseForm(request, z.object({ userId: z.coerce.number().int() }));
-		if (userId === locals.user!.id) error(400, 'You can’t remove yourself');
+		if (userId === locals.user!.id) error(400, 'Saját magadat nem távolíthatod el');
 		db.update(schema.users).set({ removedAt: new Date() }).where(eq(schema.users.id, userId)).run();
 		deleteUserSessions(userId);
 	},

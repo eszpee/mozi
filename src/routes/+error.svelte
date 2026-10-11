@@ -6,9 +6,9 @@
 
 <div class="wrap err">
 	<p class="code">{page.status}</p>
-	<h1>{page.status === 404 ? 'Nothing here' : 'Something went wrong'}</h1>
+	<h1>{page.status === 404 ? 'Itt nincs semmi' : 'Valami elromlott'}</h1>
 	<p class="muted">{page.error?.message}</p>
-	<a class="btn" href="/">Back to the picks</a>
+	<a class="btn" href="/">Vissza a filmekhez</a>
 </div>
 
 <style>

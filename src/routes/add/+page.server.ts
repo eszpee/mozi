@@ -10,7 +10,7 @@ export async function load({ url }) {
 		return { q, hits: q ? await search(q) : [], error: null };
 	} catch (e) {
 		console.error('Search failed', e);
-		return { q, hits: [], error: 'Search is unavailable right now' };
+		return { q, hits: [], error: 'A keresés most nem elérhető' };
 	}
 }
 
@@ -25,7 +25,7 @@ export const actions = {
 			id = await recommend(tmdbId, locals.user!.id);
 		} catch (e) {
 			console.error('Recommend failed', e);
-			return fail(502, { error: 'Couldn’t fetch that movie from TMDB. Try again?' });
+			return fail(502, { error: 'Nem sikerült lekérni a filmet a TMDB-ről. Próbáld újra!' });
 		}
 		redirect(303, `/movie/${id}`);
 	}

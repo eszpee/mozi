@@ -6,9 +6,9 @@
 		$props();
 
 	const LABELS = {
-		plex: { icon: '▶', text: 'In Plex' },
-		downloading: { icon: '↓', text: 'Downloading' },
-		requested: { icon: '⏳', text: 'Requested' }
+		plex: { icon: '▶', text: 'Plexben' },
+		downloading: { icon: '↓', text: 'Töltődik' },
+		requested: { icon: '⏳', text: 'Kérve' }
 	} as const;
 </script>
 

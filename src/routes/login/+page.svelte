@@ -5,22 +5,24 @@
 	let { data } = $props();
 </script>
 
-<svelte:head><title>Sign in · mozi</title></svelte:head>
+<svelte:head><title>Belépés · mozi</title></svelte:head>
 
 <Splash>
-	<p class="muted">What are we watching next?</p>
+	<p class="muted">Mit nézzünk legközelebb?</p>
 	{#if data.message}<p class="error-text" role="alert">{data.message}</p>{/if}
 	<GoogleButton />
 	{#if data.devLogin}
 		<form method="GET" action="/dev/login" class="dev">
-			<label for="as" class="faint small">Dev server only: sign in as</label>
+			<label for="as" class="faint small">Csak fejlesztői szerveren: belépés mint</label>
 			<div class="row">
-				<input id="as" name="as" class="input" placeholder="name" required maxlength="20" />
-				<button class="btn" type="submit">Go</button>
+				<input id="as" name="as" class="input" placeholder="név" required maxlength="20" />
+				<button class="btn" type="submit">Mehet</button>
 			</div>
 		</form>
 	{/if}
-	<p class="faint small">Members only. New here? Open the invite link you got from the group.</p>
+	<p class="faint small">
+		Csak tagoknak. Új vagy? Nyisd meg a meghívólinket, amit a csapattól kaptál.
+	</p>
 </Splash>
 
 <style>

@@ -66,7 +66,7 @@ function buildViews(rows: Movie[], meId: number, voters?: ReadonlySet<number>): 
 			.map((r) => [r.movieId, r.n])
 	);
 
-	const unknown: Member = { id: 0, nickname: 'former member', avatarSeed: 'x', removed: true };
+	const unknown: Member = { id: 0, nickname: 'volt tag', avatarSeed: 'x', removed: true };
 	const member = (id: number) => members.get(id) ?? unknown;
 
 	return rows.map((m) => {

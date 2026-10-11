@@ -37,7 +37,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			// The address header is absent outside the proxy chain (e.g. health checks).
 		}
 		if (!allow(`${ip}:${mutating ? 'w' : 'auth'}`, mutating ? 120 : 30, 60_000)) {
-			return new Response('Too many requests', { status: 429 });
+			return new Response('Túl sok kérés', { status: 429 });
 		}
 	}
 

@@ -11,16 +11,16 @@
 	let nickname = $state(untrack(() => data.nickname));
 </script>
 
-<svelte:head><title>Welcome · mozi</title></svelte:head>
+<svelte:head><title>Üdv · mozi</title></svelte:head>
 
 <Splash>
-	<h1>{data.firstTime ? 'Welcome!' : 'You'}</h1>
+	<h1>{data.firstTime ? 'Üdv!' : 'Te'}</h1>
 	<form method="POST" action="?/reroll" use:enhance class="avatar-row">
 		<Avatar {seed} size={96} />
-		<button class="btn btn-small" type="submit">🎲 New avatar</button>
+		<button class="btn btn-small" type="submit">🎲 Másik avatár</button>
 	</form>
 	<form method="POST" action="?/save" class="name">
-		<label for="nickname" class="muted">What should the crew call you?</label>
+		<label for="nickname" class="muted">Hogy szólítson a csapat?</label>
 		<!-- svelte-ignore a11y_autofocus -->
 		<input
 			id="nickname"
@@ -33,7 +33,7 @@
 			bind:value={nickname}
 		/>
 		{#if form && 'error' in form}<p class="error-text" role="alert">{form.error}</p>{/if}
-		<button class="btn btn-primary" type="submit">{data.firstTime ? 'Let’s go' : 'Save'}</button>
+		<button class="btn btn-primary" type="submit">{data.firstTime ? 'Mehet' : 'Mentés'}</button>
 	</form>
 </Splash>
 

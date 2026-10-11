@@ -15,14 +15,14 @@ import { radarrConfigured, requestMovie } from '#lib/server/arr.ts';
 
 const movieId = (params: { id: string }) => {
 	const id = Number(params.id);
-	if (!Number.isInteger(id) || id <= 0) error(404, 'Not found');
+	if (!Number.isInteger(id) || id <= 0) error(404, 'Nincs ilyen oldal');
 	return id;
 };
 
 export function load({ params, locals }) {
 	const me = locals.user!;
 	const movie = getMovie(movieId(params), me.id);
-	if (!movie) error(404, 'Movie not found');
+	if (!movie) error(404, 'Nincs ilyen film');
 
 	const night = openNight();
 	const attending = attendeeIds(night.id);
@@ -37,7 +37,7 @@ export function load({ params, locals }) {
 	};
 }
 
-const Body = z.string().trim().min(1, 'Write something first').max(COMMENT_MAX, 'Too long');
+const Body = z.string().trim().min(1, 'Előbb írj valamit').max(COMMENT_MAX, 'Túl hosszú');
 
 export const actions = {
 	vote,
@@ -50,7 +50,7 @@ export const actions = {
 		const parsed = Body.safeParse(form.get('body'));
 		if (!parsed.success) return fail(400, { commentError: parsed.error.issues[0].message });
 		const id = movieId(params);
-		if (!getMovie(id, locals.user!.id)) error(404, 'Movie not found');
+		if (!getMovie(id, locals.user!.id)) error(404, 'Nincs ilyen film');
 		addComment(id, locals.user!.id, parsed.data);
 	},
 	editComment: async ({ request, locals }) => {
@@ -68,18 +68,18 @@ export const actions = {
 		deleteComment(commentId, locals.user!.id, locals.admin);
 	},
 	request: async ({ params, locals }) => {
-		if (!locals.admin) error(403, 'Admins only');
+		if (!locals.admin) error(403, 'Csak adminoknak');
 		const movie = getMovie(movieId(params), locals.user!.id);
-		if (!movie) error(404, 'Movie not found');
+		if (!movie) error(404, 'Nincs ilyen film');
 		try {
 			await requestMovie(movie.tmdbId);
 		} catch (e) {
 			console.error('Radarr request failed', e);
-			return fail(502, { requestError: 'Radarr didn’t accept the request.' });
+			return fail(502, { requestError: 'A Radarr nem fogadta el a kérést.' });
 		}
 	},
 	remove: ({ params, locals }) => {
-		if (!locals.admin) error(403, 'Admins only');
+		if (!locals.admin) error(403, 'Csak adminoknak');
 		removeMovie(movieId(params));
 		redirect(303, '/');
 	}

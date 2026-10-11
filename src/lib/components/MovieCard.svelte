@@ -43,7 +43,7 @@
 			<Poster path={movie.posterPath} title={movie.title.main} {eager} />
 			<AvailabilityBadge status={movie.availability} />
 			{#if rank !== null}<span class="rank">{rank}</span>{/if}
-			{#if movie.myVote === null}<span class="new" title="You haven’t voted yet">new</span>{/if}
+			{#if movie.myVote === null}<span class="new" title="Még nem szavaztál">új</span>{/if}
 		</div>
 		<h3 class="title">{movie.title.main}</h3>
 		{#if movie.title.original}<p class="original">{movie.title.original}</p>{/if}
@@ -55,13 +55,13 @@
 	{#if movie.seenBy.length || movie.commentCount}
 		<div class="foot">
 			{#if movie.seenBy.length}
-				<span class="seen" title="Seen by {movie.seenBy.map((m) => m.nickname).join(', ')}">
+				<span class="seen" title="Látta: {movie.seenBy.map((m) => m.nickname).join(', ')}">
 					<span class="faces">
 						{#each movie.seenBy.slice(0, 4) as m (m.id)}
 							<Avatar seed={m.avatarSeed} name={m.nickname} size={18} />
 						{/each}
 					</span>
-					seen
+					látta
 				</span>
 			{/if}
 			{#if movie.commentCount}

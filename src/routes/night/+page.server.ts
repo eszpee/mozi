@@ -13,8 +13,8 @@ export function load() {
 }
 
 const NightForm = z.object({
-	label: z.string().trim().max(60, 'Keep the name under 60 characters'),
-	date: z.union([z.literal(''), z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date')])
+	label: z.string().trim().max(60, 'A név legfeljebb 60 karakter lehet'),
+	date: z.union([z.literal(''), z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Hibás dátum')])
 });
 
 export const actions = {

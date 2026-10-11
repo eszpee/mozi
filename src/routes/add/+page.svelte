@@ -44,7 +44,7 @@
 			error = null;
 			history.replaceState(history.state, '', `?q=${encodeURIComponent(q)}`);
 		} catch (e) {
-			if ((e as Error).name !== 'AbortError') error = 'Search is unavailable right now';
+			if ((e as Error).name !== 'AbortError') error = 'A keresés most nem elérhető';
 		} finally {
 			loading = false;
 		}
@@ -58,30 +58,30 @@
 	onDestroy(() => clearTimeout(timer));
 </script>
 
-<svelte:head><title>Recommend · mozi</title></svelte:head>
+<svelte:head><title>Ajánlás · mozi</title></svelte:head>
 
 <div class="wrap page">
-	<h1>Recommend a movie</h1>
+	<h1>Film ajánlása</h1>
 	<form
 		method="GET"
 		class="search"
 		role="search"
 		onsubmit={(e) => (e.preventDefault(), runSearch())}
 	>
-		<label for="q" class="sr-only">Movie title</label>
+		<label for="q" class="sr-only">Film címe</label>
 		<!-- svelte-ignore a11y_autofocus -->
 		<input
 			id="q"
 			name="q"
 			class="input"
 			type="search"
-			placeholder="Search by title…"
+			placeholder="Keresés cím alapján…"
 			autocomplete="off"
 			autofocus
 			bind:value={query}
 			oninput={onInput}
 		/>
-		{#if loading}<span class="spinner" aria-label="Searching"></span>{/if}
+		{#if loading}<span class="spinner" aria-label="Keresés…"></span>{/if}
 	</form>
 
 	{#if form?.error}<p class="error-text" role="alert">{form.error}</p>{/if}
@@ -104,7 +104,7 @@
 					</div>
 					<div class="action">
 						{#if hit.watched}
-							<a class="btn btn-small btn-ghost" href="/movie/{hit.listedId}">Watched ✓</a>
+							<a class="btn btn-small btn-ghost" href="/movie/{hit.listedId}">Megnéztük ✓</a>
 						{:else}
 							<form
 								method="POST"
@@ -123,7 +123,8 @@
 									type="submit"
 									disabled={adding !== null}
 								>
-									{#if adding === hit.tmdbId}Adding…{:else if hit.listedId}Listed · 👍{:else}＋ Add{/if}
+									{#if adding === hit.tmdbId}Hozzáadás…{:else if hit.listedId}Listán · 👍{:else}＋
+										Hozzáad{/if}
 								</button>
 							</form>
 						{/if}
@@ -132,19 +133,20 @@
 			{/each}
 		</ul>
 	{:else if query.trim().length >= 2 && !loading && !error}
-		<p class="muted">No movies found.</p>
+		<p class="muted">Nincs ilyen film.</p>
 	{:else if !query}
 		<p class="faint">
-			Adding a movie counts as your 👍. If it’s already on the list, you just add your vote.
+			Ha hozzáadsz egy filmet, az a te 👍-od is. Ha már a listán van, csak a szavazatod adódik
+			hozzá.
 		</p>
 	{/if}
 
 	<p class="attribution">
-		Movie data and posters from <a
+		A filmadatok és plakátok forrása: <a
 			href="https://www.themoviedb.org/"
 			target="_blank"
 			rel="noopener noreferrer">TMDB</a
-		>. This product uses the TMDB API but is not endorsed or certified by TMDB.
+		>. Ez az oldal a TMDB API-t használja, de a TMDB nem támogatja és nem tanúsítja.
 	</p>
 </div>
 

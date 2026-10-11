@@ -2,13 +2,13 @@ export type VoteValue = 1 | 0 | -1;
 export type Vote = { userId: number; value: VoteValue };
 
 export const SORTS = {
-	best: 'Best bet',
-	liked: 'Most liked',
-	hated: 'Least hated',
-	controversial: 'Most controversial',
-	rated: 'Highest rated',
-	released: 'Newest release',
-	added: 'Recently added'
+	best: 'Legjobb tipp',
+	liked: 'Legnépszerűbb',
+	hated: 'Legkevésbé utált',
+	controversial: 'Legmegosztóbb',
+	rated: 'Legjobb értékelés',
+	released: 'Legújabb',
+	added: 'Legutóbb ajánlott'
 } as const;
 export type SortKey = keyof typeof SORTS;
 

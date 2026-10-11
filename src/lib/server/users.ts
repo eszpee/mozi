@@ -61,7 +61,7 @@ export type Member = { id: number; nickname: string; avatarSeed: string; removed
 export function toMember(u: User): Member {
 	return {
 		id: u.id,
-		nickname: u.removedAt ? 'former member' : (u.nickname ?? '…'),
+		nickname: u.removedAt ? 'volt tag' : (u.nickname ?? '…'),
 		avatarSeed: u.avatarSeed,
 		removed: !!u.removedAt
 	};

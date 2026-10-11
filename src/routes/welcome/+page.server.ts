@@ -12,8 +12,8 @@ export function load({ locals }) {
 const Nickname = z
 	.string()
 	.trim()
-	.min(1, 'Pick a name')
-	.max(NICKNAME_MAX, `At most ${NICKNAME_MAX} characters`);
+	.min(1, 'Válassz nevet')
+	.max(NICKNAME_MAX, `Legfeljebb ${NICKNAME_MAX} karakter`);
 
 export const actions = {
 	reroll: ({ locals }) => {
@@ -41,7 +41,7 @@ export const actions = {
 				)
 			)
 			.get();
-		if (taken) return fail(400, { error: 'Someone already goes by that name' });
+		if (taken) return fail(400, { error: 'Ezt a nevet már valaki használja' });
 
 		db.update(schema.users).set({ nickname }).where(eq(schema.users.id, locals.user!.id)).run();
 		redirect(303, '/');

@@ -4,29 +4,29 @@
 	let { data, form } = $props();
 </script>
 
-<svelte:head><title>Next night · mozi</title></svelte:head>
+<svelte:head><title>Következő este · mozi</title></svelte:head>
 
 <div class="wrap page">
-	<h1>Next movie night</h1>
+	<h1>Következő mozis este</h1>
 	<form method="POST" action="?/save" class="card fields">
 		<label>
-			<span class="muted">Name (optional)</span>
+			<span class="muted">Név (nem kötelező)</span>
 			<input
 				class="input"
 				name="label"
 				maxlength="60"
-				placeholder="e.g. November at Bence’s"
+				placeholder="pl. Novemberben Bencééknél"
 				value={data.night.label ?? ''}
 			/>
 		</label>
 		<label>
-			<span class="muted">Date (optional)</span>
+			<span class="muted">Dátum (nem kötelező)</span>
 			<input class="input" name="date" type="date" value={data.night.date ?? ''} />
 		</label>
 		{#if form?.error}<p class="error-text">{form.error}</p>{/if}
 		<div class="row">
-			<button class="btn btn-primary" type="submit">Save</button>
-			<a class="btn btn-ghost" href="/">Cancel</a>
+			<button class="btn btn-primary" type="submit">Mentés</button>
+			<a class="btn btn-ghost" href="/">Mégse</a>
 		</div>
 	</form>
 	<NightStrip night={data.night} members={data.members} />

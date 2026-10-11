@@ -3,9 +3,9 @@ import { dev } from '$app/env';
 import { DEV_LOGIN } from '$app/env/private';
 
 const MESSAGES: Record<string, string> = {
-	'not-invited': 'This Google account isn’t a member yet. Ask for the invite link.',
-	expired: 'That sign-in took too long. Please try again.',
-	google: 'Google sign-in failed. Please try again.'
+	'not-invited': 'Ez a Google-fiók még nem tag. Kérd el a meghívólinket.',
+	expired: 'A belépés túl sokáig tartott. Próbáld újra.',
+	google: 'A Google-belépés nem sikerült. Próbáld újra.'
 };
 
 export function load({ locals, url }) {

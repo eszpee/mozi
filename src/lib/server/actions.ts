@@ -14,7 +14,7 @@ const id = z.coerce.number().int().positive();
 export async function parseForm<T extends z.ZodType>(request: Request, shape: T) {
 	const form = Object.fromEntries(await request.formData());
 	const parsed = shape.safeParse(form);
-	if (!parsed.success) error(400, 'Invalid form');
+	if (!parsed.success) error(400, 'Hibás űrlap');
 	return parsed.data as z.infer<T>;
 }
 
@@ -24,7 +24,7 @@ export async function vote({ request, locals }: Event) {
 		z.object({ movieId: id, value: z.enum(['1', '0', '-1']).transform(Number) })
 	);
 	if (!castVote(movieId, locals.user!.id, value as 1 | 0 | -1, true)) {
-		return fail(409, { message: 'Voting is closed for this movie' });
+		return fail(409, { message: 'Erre a filmre már nem lehet szavazni' });
 	}
 }
 
@@ -35,7 +35,7 @@ export async function seen({ request, locals }: Event) {
 		.from(schema.movies)
 		.where(and(eq(schema.movies.id, movieId), isNull(schema.movies.deletedAt)))
 		.get();
-	if (!movie) error(404, 'Movie not found');
+	if (!movie) error(404, 'Nincs ilyen film');
 	toggleSeen(movieId, locals.user!.id);
 }
 
@@ -49,6 +49,6 @@ export async function attend({ request }: Event) {
 		.from(schema.users)
 		.where(and(eq(schema.users.id, userId), isNull(schema.users.removedAt)))
 		.get();
-	if (!member) error(404, 'No such member');
+	if (!member) error(404, 'Nincs ilyen tag');
 	setAttendance(userId, attending === 'true');
 }

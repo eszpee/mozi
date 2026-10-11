@@ -12,8 +12,8 @@ async function signIn(browser: Browser, as: string, nickname: string): Promise<P
 	const page = await context.newPage();
 	await go(page, `/dev/login?as=${as}`);
 	if (page.url().endsWith('/welcome')) {
-		await page.getByLabel('What should the crew call you?').fill(nickname);
-		await page.getByRole('button', { name: 'Let’s go' }).click();
+		await page.getByLabel('Hogy szólítson a csapat?').fill(nickname);
+		await page.getByRole('button', { name: 'Mehet' }).click();
 	}
 	await expect(page).toHaveURL('/');
 	return page;
@@ -21,7 +21,7 @@ async function signIn(browser: Browser, as: string, nickname: string): Promise<P
 
 async function recommend(page: Page, query: string, title: RegExp) {
 	await go(page, '/add');
-	await page.getByRole('searchbox', { name: 'Movie title' }).fill(query);
+	await page.getByRole('searchbox', { name: 'Film címe' }).fill(query);
 	const hit = page.locator('.hit').filter({ hasText: title });
 	await hit.getByRole('button').click();
 	await expect(page).toHaveURL(/\/movie\/\d+$/);
@@ -43,25 +43,25 @@ test.describe.serial('movie night', () => {
 		await go(page, '/');
 		await expect(page).toHaveURL('/login');
 		await go(page, '/join/not-a-real-token');
-		await expect(page.getByRole('heading', { name: 'Link expired' })).toBeVisible();
+		await expect(page.getByRole('heading', { name: 'Lejárt link' })).toBeVisible();
 	});
 
 	test('a valid invite link welcomes new people', async ({ page }) => {
 		await go(admin, '/admin');
-		const link = await admin.getByLabel('Invite link').inputValue();
+		const link = await admin.getByLabel('Meghívólink').inputValue();
 		await go(page, new URL(link).pathname);
-		await expect(page.getByRole('heading', { name: /You’re invited/ })).toBeVisible();
+		await expect(page.getByRole('heading', { name: /Meghívtak/ })).toBeVisible();
 	});
 
 	test('a new avatar keeps the typed nickname', async ({ browser }) => {
 		const context = await browser.newContext();
 		const page = await context.newPage();
 		await go(page, '/dev/login?as=reroller');
-		const nickname = page.getByLabel('What should the crew call you?');
+		const nickname = page.getByLabel('Hogy szólítson a csapat?');
 		await nickname.fill('Rolly');
 		const avatar = page.locator('.avatar-row img');
 		const before = await avatar.getAttribute('src');
-		await page.getByRole('button', { name: /New avatar/ }).click();
+		await page.getByRole('button', { name: /Másik avatár/ }).click();
 		await expect(avatar).not.toHaveAttribute('src', before!);
 		await expect(nickname).toHaveValue('Rolly');
 		await context.close();
@@ -71,19 +71,19 @@ test.describe.serial('movie night', () => {
 		const context = await browser.newContext();
 		const page = await context.newPage();
 		await go(page, '/dev/login?as=copycat');
-		await page.getByLabel('What should the crew call you?').fill('bea');
-		await page.getByRole('button', { name: 'Let’s go' }).click();
-		await expect(page.getByRole('alert')).toHaveText('Someone already goes by that name');
+		await page.getByLabel('Hogy szólítson a csapat?').fill('bea');
+		await page.getByRole('button', { name: 'Mehet' }).click();
+		await expect(page.getByRole('alert')).toHaveText('Ezt a nevet már valaki használja');
 		await context.close();
 	});
 
 	test('recommending a movie adds it with a thumbs-up', async () => {
 		await go(admin, '/');
-		await expect(admin.getByRole('heading', { name: 'No picks yet' })).toBeVisible();
+		await expect(admin.getByRole('heading', { name: 'Még nincs ajánlott film' })).toBeVisible();
 		await recommend(admin, 'amel', /Amélie/);
 		await expect(admin.getByRole('heading', { name: 'Amélie', level: 1 })).toBeVisible();
 		await expect(admin.getByText("Le Fabuleux Destin d'Amélie Poulain")).toBeVisible();
-		await expect(admin.getByRole('button', { name: /Want to watch \(1\)/ })).toHaveAttribute(
+		await expect(admin.getByRole('button', { name: /Megnézném \(1\)/ })).toHaveAttribute(
 			'aria-pressed',
 			'true'
 		);
@@ -104,29 +104,29 @@ test.describe.serial('movie night', () => {
 		await expect(bea.getByText('Son of Saul')).toHaveCount(0);
 		// Their overview is Hungarian too.
 		await expect(bea.getByText(/Auschwitz-Birkenau/)).toBeVisible();
-		await bea.getByRole('button', { name: /Fine either way/ }).click();
-		await expect(bea.getByRole('button', { name: /Fine either way \(1\)/ })).toBeVisible();
+		await bea.getByRole('button', { name: /Nekem mindegy/ }).click();
+		await expect(bea.getByRole('button', { name: /Nekem mindegy \(1\)/ })).toBeVisible();
 	});
 
 	test('votes change the ranking, but cards stay put until the page reloads', async () => {
 		await go(bea, '/');
 		const before = await bea.locator('article.movie h3').allTextContents();
 		await card(bea, 'Amélie')
-			.getByRole('button', { name: /Please no/ })
+			.getByRole('button', { name: /Inkább ne/ })
 			.click();
 		await expect(
-			card(bea, 'Amélie').getByRole('button', { name: /Please no \(1\)/ })
+			card(bea, 'Amélie').getByRole('button', { name: /Inkább ne \(1\)/ })
 		).toBeVisible();
 		await card(bea, 'Kontroll')
-			.getByRole('button', { name: /Want to watch/ })
+			.getByRole('button', { name: /Megnézném/ })
 			.click();
 		await expect(
-			card(bea, 'Kontroll').getByRole('button', { name: /Want to watch \(2\)/ })
+			card(bea, 'Kontroll').getByRole('button', { name: /Megnézném \(2\)/ })
 		).toBeVisible();
 		// No jumping around while voting.
 		expect(await bea.locator('article.movie h3').allTextContents()).toEqual(before);
 		// The refresh button re-ranks in place.
-		await bea.getByRole('button', { name: 'Refresh' }).click();
+		await bea.getByRole('button', { name: 'Frissítés' }).click();
 		await expect(bea.locator('article.movie h3').first()).toHaveText('Kontroll');
 		await expect(bea.locator('article.movie h3').last()).toHaveText('Amélie');
 
@@ -161,8 +161,10 @@ test.describe.serial('movie night', () => {
 	test('comments form one thread with the author’s vote', async () => {
 		await go(bea, '/');
 		await card(bea, 'Amélie').getByRole('link').first().click();
-		await bea.getByLabel('Add a comment').fill('Too sweet for me, see https://example.com/review');
-		await bea.getByRole('button', { name: 'Post' }).click();
+		await bea
+			.getByLabel('Hozzászólás írása')
+			.fill('Too sweet for me, see https://example.com/review');
+		await bea.getByRole('button', { name: 'Küldés' }).click();
 		const comment = bea.locator('.comment').first();
 		await expect(comment).toContainText('Too sweet for me');
 		await expect(comment).toContainText('👎');
@@ -172,8 +174,8 @@ test.describe.serial('movie night', () => {
 		);
 
 		await go(admin, bea.url());
-		await admin.getByLabel('Add a comment').fill('Fair enough');
-		await admin.getByRole('button', { name: 'Post' }).click();
+		await admin.getByLabel('Hozzászólás írása').fill('Fair enough');
+		await admin.getByRole('button', { name: 'Küldés' }).click();
 		await expect(admin.locator('.comment')).toHaveCount(2);
 		await expect(admin.locator('.comment').nth(1)).toContainText('Fair enough');
 	});
@@ -182,8 +184,8 @@ test.describe.serial('movie night', () => {
 		await go(bea, '/');
 		await card(bea, 'Dune: Part Two').getByRole('link').first().click();
 		await expect(bea).toHaveURL(/\/movie\/\d+$/);
-		await expect(bea.getByRole('button', { name: 'Remove' })).toHaveCount(0);
-		await expect(bea.getByRole('button', { name: /Request in Radarr/ })).toHaveCount(0);
+		await expect(bea.getByRole('button', { name: 'Törlés', exact: true })).toHaveCount(0);
+		await expect(bea.getByRole('button', { name: /Kérés Radarrban/ })).toHaveCount(0);
 		const res = await bea.request.post(`${bea.url()}?/remove`, {
 			headers: { 'x-sveltekit-action': 'true', origin: 'http://localhost:5174' },
 			form: {}
@@ -194,11 +196,11 @@ test.describe.serial('movie night', () => {
 	test('watching a movie archives it, marks attendees seen and rolls the night over', async () => {
 		await go(admin, '/');
 		await card(admin, 'Kontroll').getByRole('link').first().click();
-		await admin.getByRole('button', { name: '🎬 We watched it' }).click();
-		await admin.getByRole('button', { name: 'Yes, we watched it' }).click();
-		await expect(admin.getByText(/Watched together on/)).toBeVisible();
+		await admin.getByRole('button', { name: '🎬 Megnéztük' }).click();
+		await admin.getByRole('button', { name: 'Igen, megnéztük' }).click();
+		await expect(admin.getByText(/Együtt néztük meg/)).toBeVisible();
 		await expect(admin.locator('.seen-by')).toContainText('Peter');
-		await expect(admin.getByRole('button', { name: /Want to watch/ })).toBeDisabled();
+		await expect(admin.getByRole('button', { name: /Megnézném/ })).toBeDisabled();
 
 		await go(admin, '/');
 		await expect(card(admin, 'Kontroll')).toHaveCount(0);
@@ -211,7 +213,7 @@ test.describe.serial('movie night', () => {
 		await go(admin, '/watched');
 		await expect(admin.getByRole('link', { name: 'Kontroll' })).toBeVisible();
 		await admin.getByRole('button', { name: '⋯' }).click();
-		await admin.getByRole('button', { name: 'Undo' }).click();
+		await admin.getByRole('button', { name: 'Visszavonás' }).click();
 		await expect(admin.getByRole('link', { name: 'Kontroll' })).toHaveCount(0);
 		await go(admin, '/');
 		await expect(card(admin, 'Kontroll')).toBeVisible();
@@ -221,8 +223,8 @@ test.describe.serial('movie night', () => {
 	test('individual seen marks show on the card', async () => {
 		await go(bea, '/');
 		await card(bea, 'Dune: Part Two').getByRole('link').first().click();
-		await bea.getByRole('button', { name: 'I’ve seen it' }).click();
-		await expect(bea.getByRole('button', { name: '✓ I’ve seen it' })).toBeVisible();
+		await bea.getByRole('button', { name: 'Már láttam' }).click();
+		await expect(bea.getByRole('button', { name: '✓ Már láttam' })).toBeVisible();
 		await go(bea, '/');
 		await expect(card(bea, 'Dune: Part Two').locator('.seen')).toBeVisible();
 	});
@@ -230,16 +232,16 @@ test.describe.serial('movie night', () => {
 	test('admin can remove a movie and remove a member', async () => {
 		await go(admin, '/');
 		await card(admin, 'Dune: Part Two').getByRole('link').first().click();
-		await admin.getByRole('button', { name: 'Remove' }).click();
-		await admin.getByRole('button', { name: 'Remove for everyone' }).click();
+		await admin.getByRole('button', { name: 'Törlés', exact: true }).click();
+		await admin.getByRole('button', { name: 'Törlés mindenkinek' }).click();
 		await expect(admin).toHaveURL('/');
 		await expect(card(admin, 'Dune: Part Two')).toHaveCount(0);
 
 		await go(admin, '/admin');
 		const row = admin.locator('.members li').filter({ hasText: 'Bea' });
 		await row.getByRole('button', { name: '⋯' }).click();
-		await row.getByRole('button', { name: 'Remove' }).click();
-		await expect(row).toContainText('removed');
+		await row.getByRole('button', { name: 'Eltávolítás' }).click();
+		await expect(row).toContainText('eltávolítva');
 
 		await go(bea, '/');
 		await expect(bea).toHaveURL('/login');

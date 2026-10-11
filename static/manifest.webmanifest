@@ -1,7 +1,7 @@
 {
 	"name": "mozi",
 	"short_name": "mozi",
-	"description": "What are we watching next?",
+	"description": "Mit nézzünk legközelebb?",
 	"start_url": "/",
 	"display": "standalone",
 	"background_color": "#0b0b10",

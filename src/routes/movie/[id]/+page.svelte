@@ -63,7 +63,7 @@
 					class="btn btn-small"
 					href={trailerUrl(movie.trailerKey, movie.title.main, movie.year)}
 					target="_blank"
-					rel="noopener noreferrer">▶ Trailer</a
+					rel="noopener noreferrer">▶ Előzetes</a
 				>
 			</div>
 		</div>
@@ -73,8 +73,8 @@
 <div class="wrap body">
 	{#if watched}
 		<p class="watched-note card">
-			✓ Watched together on {formatDate(movie.watchedAt!)}. Votes are closed.
-			<a href="/watched">See all watched</a>
+			✓ Együtt néztük meg: {formatDate(movie.watchedAt!)}. A szavazás lezárult.
+			<a href="/watched">Az összes megnézett</a>
 		</p>
 	{/if}
 
@@ -118,7 +118,7 @@
 				type="submit"
 				aria-pressed={movie.mySeen}
 			>
-				{movie.mySeen ? '✓ I’ve seen it' : 'I’ve seen it'}
+				{movie.mySeen ? '✓ Már láttam' : 'Már láttam'}
 			</button>
 		</form>
 
@@ -127,26 +127,26 @@
 				<form method="POST" action="?/watched" class="confirm">
 					<span class="muted">
 						{data.attendees.length
-							? `Marks it seen for ${data.attendees.map((a) => a.nickname).join(', ')} and starts a new night.`
-							: 'Archives it and starts a new night.'}
+							? `Látottnak jelöli nekik: ${data.attendees.map((a) => a.nickname).join(', ')}, és új estét kezd.`
+							: 'Archiválja, és új estét kezd.'}
 					</span>
-					<button class="btn btn-small btn-primary" type="submit">Yes, we watched it</button>
+					<button class="btn btn-small btn-primary" type="submit">Igen, megnéztük</button>
 					<button
 						class="btn btn-small btn-ghost"
 						type="button"
-						onclick={() => (confirmWatched = false)}>Cancel</button
+						onclick={() => (confirmWatched = false)}>Mégse</button
 					>
 				</form>
 			{:else}
 				<button class="btn btn-small" type="button" onclick={() => (confirmWatched = true)}
-					>🎬 We watched it</button
+					>🎬 Megnéztük</button
 				>
 			{/if}
 		{/if}
 
 		{#if data.canRequest}
 			<form method="POST" action="?/request" use:enhance>
-				<button class="btn btn-small" type="submit">＋ Request in Radarr</button>
+				<button class="btn btn-small" type="submit">＋ Kérés Radarrban</button>
 			</form>
 		{/if}
 		{#if form?.requestError}<p class="error-text">{form.requestError}</p>{/if}
@@ -154,18 +154,18 @@
 		{#if data.admin}
 			{#if confirmRemove}
 				<form method="POST" action="?/remove" class="confirm">
-					<button class="btn btn-small danger" type="submit">Remove for everyone</button>
+					<button class="btn btn-small danger" type="submit">Törlés mindenkinek</button>
 					<button
 						class="btn btn-small btn-ghost"
 						type="button"
-						onclick={() => (confirmRemove = false)}>Cancel</button
+						onclick={() => (confirmRemove = false)}>Mégse</button
 					>
 				</form>
 			{:else}
 				<button
 					class="btn btn-small btn-ghost danger-text"
 					type="button"
-					onclick={() => (confirmRemove = true)}>Remove</button
+					onclick={() => (confirmRemove = true)}>Törlés</button
 				>
 			{/if}
 		{/if}
@@ -173,7 +173,7 @@
 
 	{#if movie.seenBy.length}
 		<p class="seen-by">
-			<span class="faint">Seen by</span>
+			<span class="faint">Látta</span>
 			{#each movie.seenBy as m (m.id)}
 				<span class="person"
 					><Avatar seed={m.avatarSeed} name={m.nickname} size={22} />{m.nickname}</span
@@ -183,11 +183,11 @@
 	{/if}
 
 	{#if movie.overview}<p class="overview">{movie.overview}</p>{/if}
-	<p class="faint added">Recommended by {movie.addedBy.nickname} · {timeAgo(movie.addedAt)}</p>
+	<p class="faint added">Ajánlotta: {movie.addedBy.nickname} · {timeAgo(movie.addedAt)}</p>
 
 	<section id="comments" class="comments">
 		<h2>
-			Comments {#if data.comments.length}<span class="faint">{data.comments.length}</span>{/if}
+			Hozzászólások {#if data.comments.length}<span class="faint">{data.comments.length}</span>{/if}
 		</h2>
 		{#if data.comments.length}
 			<ol class="thread">
@@ -197,9 +197,9 @@
 						<div class="bubble">
 							<p class="meta">
 								<strong>{c.author.nickname}</strong>
-								{#if c.authorVote !== null}<span title="Their vote">{voteEmoji(c.authorVote)}</span
+								{#if c.authorVote !== null}<span title="Szavazata">{voteEmoji(c.authorVote)}</span
 									>{/if}
-								<span class="faint">{timeAgo(c.createdAt)}{c.edited ? ' · edited' : ''}</span>
+								<span class="faint">{timeAgo(c.createdAt)}{c.edited ? ' · szerkesztve' : ''}</span>
 							</p>
 							{#if editingId === c.id}
 								<form
@@ -215,11 +215,11 @@
 									<input type="hidden" name="commentId" value={c.id} />
 									<textarea class="input" name="body" maxlength="2000" required>{c.body}</textarea>
 									<div class="row">
-										<button class="btn btn-small btn-primary" type="submit">Save</button>
+										<button class="btn btn-small btn-primary" type="submit">Mentés</button>
 										<button
 											class="btn btn-small btn-ghost"
 											type="button"
-											onclick={() => (editingId = null)}>Cancel</button
+											onclick={() => (editingId = null)}>Mégse</button
 										>
 									</div>
 								</form>
@@ -228,7 +228,7 @@
 								{#if c.mine || data.admin}
 									<div class="tools">
 										{#if c.mine}<button type="button" onclick={() => (editingId = c.id)}
-												>Edit</button
+												>Szerkesztés</button
 											>{/if}
 										<form
 											method="POST"
@@ -238,7 +238,7 @@
 													update({ reset: false })}
 										>
 											<input type="hidden" name="commentId" value={c.id} />
-											<button type="submit">Delete</button>
+											<button type="submit">Törlés</button>
 										</form>
 									</div>
 								{/if}
@@ -248,7 +248,7 @@
 				{/each}
 			</ol>
 		{:else}
-			<p class="faint">No comments yet. Why should (or shouldn’t) we watch it?</p>
+			<p class="faint">Még nincs hozzászólás. Miért nézzük meg (vagy miért ne)?</p>
 		{/if}
 
 		<form
@@ -264,21 +264,21 @@
 				};
 			}}
 		>
-			<label for="comment" class="sr-only">Add a comment</label>
+			<label for="comment" class="sr-only">Hozzászólás írása</label>
 			<textarea
 				id="comment"
 				class="input"
 				name="body"
 				maxlength="2000"
 				rows="2"
-				placeholder="Add a comment…"
+				placeholder="Írj hozzászólást…"
 				required
 				bind:value={commentBody}></textarea>
 			{#if form?.commentError}<p class="error-text">{form.commentError}</p>{/if}
 			<button
 				class="btn btn-primary btn-small"
 				type="submit"
-				disabled={posting || !commentBody.trim()}>Post</button
+				disabled={posting || !commentBody.trim()}>Küldés</button
 			>
 		</form>
 	</section>
