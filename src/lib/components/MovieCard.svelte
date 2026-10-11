@@ -24,6 +24,7 @@
 			myVote: VoteValue | null;
 			seenBy: Member[];
 			commentCount: number;
+			addedBy: { nickname: string; avatarSeed: string };
 		};
 		eager?: boolean;
 	} = $props();
@@ -41,6 +42,13 @@
 			<Poster path={movie.posterPath} title={movie.title.main} {eager} />
 			<AvailabilityBadge status={movie.availability} />
 			{#if movie.myVote === null}<span class="new" title="Még nem szavaztál">új</span>{/if}
+			<span class="added-by">
+				<Avatar
+					seed={movie.addedBy.avatarSeed}
+					name="Ajánlotta: {movie.addedBy.nickname}"
+					size={28}
+				/>
+			</span>
 		</div>
 		<h3 class="title">{movie.title.main}</h3>
 		{#if movie.title.original}<p class="original">{movie.title.original}</p>{/if}
@@ -107,6 +115,17 @@
 		font-weight: 750;
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
+	}
+
+	.added-by {
+		position: absolute;
+		left: 8px;
+		bottom: 8px;
+		display: flex;
+		padding: 2px;
+		border-radius: 50%;
+		background: rgb(0 0 0 / 0.45);
+		box-shadow: 0 2px 10px rgb(0 0 0 / 0.4);
 	}
 
 	.title {
