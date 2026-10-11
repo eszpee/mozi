@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { languageName } from './ui.ts';
+import { languageName, providerUrl } from './ui.ts';
 
 describe('languageName', () => {
 	it('names languages in Hungarian', () => {
@@ -16,5 +16,31 @@ describe('languageName', () => {
 		expect(languageName('xx')).toBeNull();
 		expect(languageName(null)).toBeNull();
 		expect(languageName('')).toBeNull();
+	});
+});
+
+describe('providerUrl', () => {
+	it('searches the service for the title', () => {
+		expect(providerUrl('Netflix', 'Inception', null)).toBe(
+			'https://www.netflix.com/search?q=Inception'
+		);
+		expect(providerUrl('HBO Max', 'Son of Saul', null)).toBe(
+			'https://play.hbomax.com/search?q=Son%20of%20Saul'
+		);
+		expect(providerUrl('Google Play Movies', 'Amélie', null)).toBe(
+			'https://play.google.com/store/search?q=Am%C3%A9lie&c=movies'
+		);
+	});
+
+	it('treats tiers and renamed services as the same service', () => {
+		expect(providerUrl('Netflix basic with Ads', 'Dune', null)).toContain('netflix.com');
+		expect(providerUrl('Max', 'Dune', null)).toContain('hbomax.com');
+		expect(providerUrl('Apple TV Plus', 'Dune', null)).toContain('tv.apple.com');
+	});
+
+	it('falls back to the TMDB watch page for unknown services', () => {
+		const tmdb = 'https://www.themoviedb.org/movie/27205/watch?locale=HU';
+		expect(providerUrl('Filmio', 'Inception', tmdb)).toBe(tmdb);
+		expect(providerUrl('Filmio', 'Inception', null)).toBeNull();
 	});
 });

@@ -16,6 +16,27 @@ export function posterUrl(path: string | null, width: 185 | 342 | 500 | 780 = 34
 /** A TMDB watch-provider logo (square). */
 export const providerLogoUrl = (path: string) => `https://image.tmdb.org/t/p/w92${path}`;
 
+// TMDB has no per-service link to a movie, so each logo opens that service's search
+// for the title. Keyed by name prefix, which also covers tiers like "Netflix basic with Ads".
+const PROVIDER_SEARCH: [prefix: string, url: (q: string) => string][] = [
+	['netflix', (q) => `https://www.netflix.com/search?q=${q}`],
+	['hbo max', (q) => `https://play.hbomax.com/search?q=${q}`],
+	['max', (q) => `https://play.hbomax.com/search?q=${q}`],
+	['apple tv', (q) => `https://tv.apple.com/hu/search?term=${q}`],
+	['google play', (q) => `https://play.google.com/store/search?q=${q}&c=movies`],
+	['disney', (q) => `https://www.disneyplus.com/search?q=${q}`],
+	['amazon', (q) => `https://www.primevideo.com/search?phrase=${q}`],
+	['skyshowtime', (q) => `https://www.skyshowtime.com/hu/search?q=${q}`],
+	['plex', (q) => `https://app.plex.tv/desktop/#!/search?query=${q}`]
+];
+
+/** Where a provider logo links: the service's search for the title, else TMDB's watch page. */
+export function providerUrl(name: string, title: string, fallback: string | null) {
+	const n = name.toLowerCase();
+	const hit = PROVIDER_SEARCH.find(([prefix]) => n.startsWith(prefix));
+	return hit ? hit[1](encodeURIComponent(title)) : fallback;
+}
+
 export function formatRuntime(minutes: number | null) {
 	if (!minutes) return null;
 	const h = Math.floor(minutes / 60);

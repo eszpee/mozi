@@ -11,6 +11,7 @@
 		languageName,
 		posterUrl,
 		providerLogoUrl,
+		providerUrl,
 		timeAgo,
 		trailerUrl,
 		voteEmoji
@@ -37,13 +38,24 @@
 	]);
 	let watched = $derived(movie.watchedAt !== null);
 	// Our own Plex first: if it's downloaded, that's the easiest way to watch it.
+	const logo = (p: { name: string; logo: string }) => ({
+		name: p.name,
+		src: providerLogoUrl(p.logo),
+		href: providerUrl(p.name, movie.title.main, movie.providers.link)
+	});
 	let streams = $derived([
-		...(movie.availability === 'plex' ? [{ name: 'Plex', src: '/providers/plex.svg' }] : []),
-		...movie.providers.stream.map((p) => ({ name: p.name, src: providerLogoUrl(p.logo) }))
+		...(movie.availability === 'plex'
+			? [
+					{
+						name: 'Plex',
+						src: '/providers/plex.svg',
+						href: providerUrl('Plex', movie.title.main, null)
+					}
+				]
+			: []),
+		...movie.providers.stream.map(logo)
 	]);
-	let rentals = $derived(
-		movie.providers.rent.map((p) => ({ name: p.name, src: providerLogoUrl(p.logo) }))
-	);
+	let rentals = $derived(movie.providers.rent.map(logo));
 </script>
 
 <svelte:head><title>{movie.title.main} · mozi</title></svelte:head>
@@ -82,7 +94,16 @@
 					<div class="providers">
 						<span class="details">{row.label}:</span>
 						{#each row.list as p (p.name)}
-							<img src={p.src} alt={p.name} title={p.name} width="28" height="28" loading="lazy" />
+							<a href={p.href} target="_blank" rel="noopener noreferrer">
+								<img
+									src={p.src}
+									alt={p.name}
+									title={p.name}
+									width="28"
+									height="28"
+									loading="lazy"
+								/>
+							</a>
 						{/each}
 					</div>
 				{/if}
@@ -415,6 +436,10 @@
 
 	.providers .details {
 		margin-right: 2px;
+	}
+
+	.providers a {
+		display: flex;
 	}
 
 	.providers img {
