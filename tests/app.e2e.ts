@@ -12,7 +12,7 @@ async function signIn(browser: Browser, as: string, nickname: string): Promise<P
 	const page = await context.newPage();
 	await go(page, `/dev/login?as=${as}`);
 	if (page.url().endsWith('/welcome')) {
-		await page.getByLabel('Hogy szólítson a csapat?').fill(nickname);
+		await page.getByLabel('Hogy hívnak?').fill(nickname);
 		await page.getByRole('button', { name: 'Mehet' }).click();
 	}
 	await expect(page).toHaveURL('/');
@@ -57,11 +57,11 @@ test.describe.serial('movie night', () => {
 		const context = await browser.newContext();
 		const page = await context.newPage();
 		await go(page, '/dev/login?as=reroller');
-		const nickname = page.getByLabel('Hogy szólítson a csapat?');
+		const nickname = page.getByLabel('Hogy hívnak?');
 		await nickname.fill('Rolly');
 		const avatar = page.locator('.avatar-row img');
 		const before = await avatar.getAttribute('src');
-		await page.getByRole('button', { name: /Másik avatár/ }).click();
+		await page.getByRole('button', { name: /Új képet kérek/ }).click();
 		await expect(avatar).not.toHaveAttribute('src', before!);
 		await expect(nickname).toHaveValue('Rolly');
 		const picked = await avatar.getAttribute('src');
@@ -69,10 +69,10 @@ test.describe.serial('movie night', () => {
 		await go(page, '/welcome');
 		await expect(avatar).toHaveAttribute('src', before!);
 		// Saving stores the new one.
-		await page.getByRole('button', { name: /Másik avatár/ }).click();
+		await page.getByRole('button', { name: /Új képet kérek/ }).click();
 		const saved = await avatar.getAttribute('src');
 		expect(saved).not.toBe(picked);
-		await page.getByLabel('Hogy szólítson a csapat?').fill('Rolly');
+		await page.getByLabel('Hogy hívnak?').fill('Rolly');
 		await page.getByRole('button', { name: 'Mehet' }).click();
 		await expect(page).toHaveURL('/');
 		await go(page, '/welcome');
@@ -84,7 +84,7 @@ test.describe.serial('movie night', () => {
 		const context = await browser.newContext();
 		const page = await context.newPage();
 		await go(page, '/dev/login?as=copycat');
-		await page.getByLabel('Hogy szólítson a csapat?').fill('bea');
+		await page.getByLabel('Hogy hívnak?').fill('bea');
 		await page.getByRole('button', { name: 'Mehet' }).click();
 		await expect(page.getByRole('alert')).toHaveText('Ezt a nevet már valaki használja');
 		await context.close();

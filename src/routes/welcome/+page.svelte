@@ -26,7 +26,7 @@
 	<h1>{data.firstTime ? 'Üdv!' : 'Te'}</h1>
 	<div class="avatar-row">
 		<Avatar {seed} size={96} />
-		<button class="btn btn-small" type="button" onclick={reroll}>🎲 Másik avatár</button>
+		<button class="btn btn-small" type="button" onclick={reroll}>🎲 Új képet kérek</button>
 	</div>
 	<form
 		method="POST"
@@ -37,7 +37,7 @@
 				update({ reset: false })}
 	>
 		<input type="hidden" name="avatarSeed" value={seed} />
-		<label for="nickname" class="muted">Hogy szólítson a csapat?</label>
+		<label for="nickname" class="muted">Hogy hívnak?</label>
 		<!-- svelte-ignore a11y_autofocus -->
 		<input
 			id="nickname"
