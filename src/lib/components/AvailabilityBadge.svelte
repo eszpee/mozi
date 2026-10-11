@@ -8,7 +8,7 @@
 	const LABELS = {
 		plex: { icon: '▶', text: 'Elérhető' },
 		downloading: { icon: '↓', text: 'Töltődik' },
-		requested: { icon: '⏳', text: 'Kérve' }
+		requested: { icon: '⏳', text: 'Keressük' }
 	} as const;
 </script>
 
