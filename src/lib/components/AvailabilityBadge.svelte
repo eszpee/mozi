@@ -6,7 +6,7 @@
 		$props();
 
 	const LABELS = {
-		plex: { icon: '▶', text: 'Plexben' },
+		plex: { icon: '▶', text: 'Elérhető' },
 		downloading: { icon: '↓', text: 'Töltődik' },
 		requested: { icon: '⏳', text: 'Kérve' }
 	} as const;

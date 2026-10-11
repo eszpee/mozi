@@ -15,7 +15,7 @@
 
 	const nav = [
 		{ href: '/', label: 'Filmek' },
-		{ href: '/watched', label: 'Megnéztük' }
+		{ href: '/watched', label: 'Láttuk már' }
 	];
 </script>
 

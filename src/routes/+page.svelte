@@ -79,6 +79,24 @@
 	{#if total > 0}
 		<div class="controls">
 			<div class="row">
+				<div class="filters">
+					<a
+						class="chip"
+						href={withParam('needs-vote', data.needsVote ? null : '')}
+						aria-current={data.needsVote ? 'true' : undefined}
+						data-sveltekit-reset="false"
+						data-sveltekit-replacestate
+					>
+						Amikre még nem szavaztam{#if unvoted}<span class="count">{unvoted}</span>{/if}
+					</a>
+					<a
+						class="chip"
+						href={withParam('plex', data.inPlex ? null : '')}
+						aria-current={data.inPlex ? 'true' : undefined}
+						data-sveltekit-reset="false"
+						data-sveltekit-replacestate>▶ Elérhető</a
+					>
+				</div>
 				<div class="segmented" role="group" aria-label="Kinek a szavazata számít">
 					<a
 						href={withParam('scope', null)}
@@ -90,25 +108,7 @@
 						href={withParam('scope', 'night')}
 						aria-current={data.scope === 'night' ? 'true' : undefined}
 						data-sveltekit-reset="false"
-						data-sveltekit-replacestate>Következő este</a
-					>
-				</div>
-				<div class="filters">
-					<a
-						class="chip"
-						href={withParam('needs-vote', data.needsVote ? null : '')}
-						aria-current={data.needsVote ? 'true' : undefined}
-						data-sveltekit-reset="false"
-						data-sveltekit-replacestate
-					>
-						Még nem szavaztam{#if unvoted}<span class="count">{unvoted}</span>{/if}
-					</a>
-					<a
-						class="chip"
-						href={withParam('plex', data.inPlex ? null : '')}
-						aria-current={data.inPlex ? 'true' : undefined}
-						data-sveltekit-reset="false"
-						data-sveltekit-replacestate>▶ Plexben</a
+						data-sveltekit-replacestate>Csak az számít, aki jön</a
 					>
 				</div>
 			</div>

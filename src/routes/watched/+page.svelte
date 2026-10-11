@@ -7,7 +7,7 @@
 	let confirmUndo: number | null = $state(null);
 </script>
 
-<svelte:head><title>Megnéztük · mozi</title></svelte:head>
+<svelte:head><title>Láttuk már · mozi</title></svelte:head>
 
 <div class="wrap page">
 	<h1>Együtt néztük</h1>
@@ -50,7 +50,7 @@
 	{:else}
 		<div class="empty card">
 			<p class="muted">
-				Még nem néztetek meg semmit. Ha a csapat megnéz egy filmet, nyisd meg, és koppints a
+				Még nem néztetek meg semmit. Ha együtt megnéztetek egy filmet, nyisd meg, és kattints a
 				„Megnéztük” gombra.
 			</p>
 		</div>

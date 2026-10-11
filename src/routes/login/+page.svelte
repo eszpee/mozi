@@ -20,9 +20,7 @@
 			</div>
 		</form>
 	{/if}
-	<p class="faint small">
-		Csak tagoknak. Új vagy? Nyisd meg a meghívólinket, amit a csapattól kaptál.
-	</p>
+	<p class="faint small">Csak tagoknak. Új vagy? Nyisd meg a meghívólinket, amit kaptál.</p>
 </Splash>
 
 <style>
