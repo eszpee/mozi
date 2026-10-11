@@ -24,6 +24,8 @@ export type MovieView = {
 	posterPath: string | null;
 	imdbId: string | null;
 	trailerKey: string | null;
+	directors: string[];
+	cast: string[];
 	addedAt: number;
 	addedBy: Member;
 	watchedAt: number | null;
@@ -93,6 +95,8 @@ function buildViews(rows: Movie[], meId: number, voters?: ReadonlySet<number>): 
 			posterPath: m.meta.posterPath,
 			imdbId: m.meta.imdbId,
 			trailerKey: m.meta.trailerKey,
+			directors: m.meta.directors ?? [],
+			cast: m.meta.cast ?? [],
 			addedAt: m.addedAt.getTime(),
 			addedBy: member(m.addedBy),
 			watchedAt: m.watchedAt?.getTime() ?? null,
@@ -323,10 +327,11 @@ export async function refreshStaleMeta(limit = 10) {
 		.where(
 			and(
 				isNull(schema.movies.deletedAt),
-				// Stale, or cached before `releaseDate` existed (a JSON null means TMDB has none).
+				// Stale, or cached before `releaseDate` / credits existed (a JSON null means TMDB has none).
 				or(
 					sql`${schema.movies.metaRefreshedAt} < ${Date.now() - WEEK}`,
-					sql`json_type(${schema.movies.meta}, '$.releaseDate') IS NULL`
+					sql`json_type(${schema.movies.meta}, '$.releaseDate') IS NULL`,
+					sql`json_type(${schema.movies.meta}, '$.cast') IS NULL`
 				)
 			)
 		)

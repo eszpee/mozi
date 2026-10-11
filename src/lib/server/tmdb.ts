@@ -92,6 +92,7 @@ type TmdbDetails = {
 		translations: { iso_639_1: string; data: { title?: string; overview?: string } }[];
 	};
 	images?: { posters: { file_path: string; iso_639_1: string | null }[] };
+	credits?: { cast: { name: string; order: number }[]; crew: { name: string; job: string }[] };
 };
 
 /** Picks the most fitting YouTube trailer: official trailers first, then teasers. */
@@ -112,7 +113,7 @@ export async function fetchMovieMeta(tmdbId: number): Promise<MovieMeta> {
 	}
 	const d = await tmdb<TmdbDetails>(`/movie/${tmdbId}`, {
 		language: 'en-US',
-		append_to_response: 'videos,translations,images',
+		append_to_response: 'videos,translations,images,credits',
 		include_video_language: 'en,hu,null',
 		include_image_language: 'hu,en,null'
 	});
@@ -137,7 +138,12 @@ export async function fetchMovieMeta(tmdbId: number): Promise<MovieMeta> {
 		posterPath: huPoster ?? d.poster_path,
 		rating: d.vote_count > 0 ? Math.round(d.vote_average * 10) / 10 : null,
 		imdbId: d.imdb_id || null,
-		trailerKey: pickTrailer(d.videos?.results ?? [], d.original_language)
+		trailerKey: pickTrailer(d.videos?.results ?? [], d.original_language),
+		directors: (d.credits?.crew ?? []).filter((c) => c.job === 'Director').map((c) => c.name),
+		cast: (d.credits?.cast ?? [])
+			.toSorted((a, b) => a.order - b.order)
+			.slice(0, 3)
+			.map((c) => c.name)
 	};
 }
 

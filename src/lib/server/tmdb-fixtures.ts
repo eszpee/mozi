@@ -20,7 +20,9 @@ export const FIXTURE_MOVIES: { tmdbId: number; meta: MovieMeta }[] = [
 			posterPath: '/nSxDa3M9aMvGVLoItzWTepQ5h5d.jpg',
 			rating: 7.9,
 			imdbId: 'tt0211915',
-			trailerKey: '555A7T_kmIc'
+			trailerKey: '555A7T_kmIc',
+			directors: ['Jean-Pierre Jeunet'],
+			cast: ['Audrey Tautou', 'Mathieu Kassovitz', 'Rufus']
 		}
 	},
 	{
@@ -38,7 +40,9 @@ export const FIXTURE_MOVIES: { tmdbId: number; meta: MovieMeta }[] = [
 			posterPath: '/wtK8xY4gxSw9Sm85sNjinknQjRq.jpg',
 			rating: 7.2,
 			imdbId: 'tt0373981',
-			trailerKey: 'Dx5Rt2BPLLc'
+			trailerKey: 'Dx5Rt2BPLLc',
+			directors: ['Nimród Antal'],
+			cast: ['Sándor Csányi', 'Zoltán Mucsi', 'Csaba Pindroch']
 		}
 	},
 	{
@@ -56,7 +60,9 @@ export const FIXTURE_MOVIES: { tmdbId: number; meta: MovieMeta }[] = [
 			posterPath: '/2Wwry3NpctToC0qzMyTOqFxZVdZ.jpg',
 			rating: 7.1,
 			imdbId: 'tt3808342',
-			trailerKey: 'PSabBa9IWYs'
+			trailerKey: 'PSabBa9IWYs',
+			directors: ['László Nemes'],
+			cast: ['Géza Röhrig', 'Levente Molnár', 'Urs Rechn']
 		}
 	},
 	{
@@ -74,7 +80,9 @@ export const FIXTURE_MOVIES: { tmdbId: number; meta: MovieMeta }[] = [
 			posterPath: '/6izwz7rsy95ARzTR3poZ8H6c5pp.jpg',
 			rating: 8.1,
 			imdbId: 'tt15239678',
-			trailerKey: 'U2Qp5pL3ovA'
+			trailerKey: 'U2Qp5pL3ovA',
+			directors: ['Denis Villeneuve'],
+			cast: ['Timothée Chalamet', 'Zendaya', 'Rebecca Ferguson']
 		}
 	},
 	{
@@ -92,7 +100,9 @@ export const FIXTURE_MOVIES: { tmdbId: number; meta: MovieMeta }[] = [
 			posterPath: '/zhG3vKWyDRaZYoaww1UVAi29T9h.jpg',
 			rating: 8.6,
 			imdbId: 'tt0050083',
-			trailerKey: 'TEN-2uTi2c0'
+			trailerKey: 'TEN-2uTi2c0',
+			directors: ['Sidney Lumet'],
+			cast: ['Henry Fonda', 'Lee J. Cobb', 'Martin Balsam']
 		}
 	},
 	{
@@ -110,7 +120,9 @@ export const FIXTURE_MOVIES: { tmdbId: number; meta: MovieMeta }[] = [
 			posterPath: '/xlaY2zyzMfkhk0HSC5VUwzoZPU1.jpg',
 			rating: 8.4,
 			imdbId: 'tt1375666',
-			trailerKey: 'cdx31ak4KbQ'
+			trailerKey: 'cdx31ak4KbQ',
+			directors: ['Christopher Nolan'],
+			cast: ['Leonardo DiCaprio', 'Joseph Gordon-Levitt', 'Ken Watanabe']
 		}
 	}
 ];

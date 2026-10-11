@@ -60,6 +60,14 @@
 			{#if languageName(movie.originalLanguage)}
 				<p class="details">Eredeti nyelv: {languageName(movie.originalLanguage)}</p>
 			{/if}
+			{#if movie.directors.length}
+				<p class="details">
+					{movie.directors.length > 1 ? 'Rendezők' : 'Rendező'}: {movie.directors.join(', ')}
+				</p>
+			{/if}
+			{#if movie.cast.length}
+				<p class="details">Főszereplők: {movie.cast.join(', ')}</p>
+			{/if}
 			{#if movie.rating}<p class="rating">★ {movie.rating.toFixed(1)} <span>TMDB</span></p>{/if}
 			<div class="links">
 				{#if movie.imdbId}

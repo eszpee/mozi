@@ -53,6 +53,10 @@ export type MovieMeta = {
 	rating: number | null;
 	imdbId: string | null;
 	trailerKey: string | null;
+	/** Missing on movies cached before credits were added. */
+	directors?: string[];
+	/** Top-billed cast, at most three. */
+	cast?: string[];
 };
 
 export const movies = sqliteTable(
