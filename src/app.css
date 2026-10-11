@@ -165,6 +165,8 @@ select {
 	border-radius: var(--radius);
 	border: 1px solid var(--line-strong);
 	background: var(--bg-sunken);
+	/* Below 16px iOS zooms in on focus and stays zoomed, so the page pans sideways. */
+	font-size: 16px;
 	outline: none;
 	transition: border-color 0.15s;
 }

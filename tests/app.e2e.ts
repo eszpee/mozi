@@ -304,6 +304,13 @@ test.describe.serial('movie night', () => {
 						.map((e) => e.className);
 				});
 				expect(sticking, `${width}px ${path}`).toEqual([]);
+				// iOS zooms in on fields under 16px, and the zoomed page pans sideways.
+				const small = await admin.evaluate(() =>
+					[...document.querySelectorAll('input:not([type=hidden], [readonly]), textarea, select')]
+						.filter((e) => parseFloat(getComputedStyle(e).fontSize) < 16)
+						.map((e) => e.getAttribute('name'))
+				);
+				expect(small, `${width}px ${path}`).toEqual([]);
 			}
 		}
 	});
