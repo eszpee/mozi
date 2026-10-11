@@ -3,6 +3,7 @@ import { TMDB_TOKEN } from '$app/env/private';
 import type { MovieMeta } from '#lib/server/db/schema.ts';
 import { FIXTURE_MOVIES } from './tmdb-fixtures.ts';
 import { summarizeProviders, type TmdbCountryProviders } from './providers.ts';
+import { pickAgeRating } from './age-rating.ts';
 
 const API = 'https://api.themoviedb.org/3';
 
@@ -93,6 +94,9 @@ type TmdbDetails = {
 		translations: { iso_639_1: string; data: { title?: string; overview?: string } }[];
 	};
 	images?: { posters: { file_path: string; iso_639_1: string | null }[] };
+	release_dates?: {
+		results: { iso_3166_1: string; release_dates: { certification: string }[] }[];
+	};
 	'watch/providers'?: { results: Record<string, TmdbCountryProviders> };
 	credits?: { cast: { name: string; order: number }[]; crew: { name: string; job: string }[] };
 };
@@ -115,7 +119,7 @@ export async function fetchMovieMeta(tmdbId: number): Promise<MovieMeta> {
 	}
 	const d = await tmdb<TmdbDetails>(`/movie/${tmdbId}`, {
 		language: 'en-US',
-		append_to_response: 'videos,translations,images,credits,watch/providers',
+		append_to_response: 'videos,translations,images,credits,watch/providers,release_dates',
 		include_video_language: 'en,hu,null',
 		include_image_language: 'hu,en,null'
 	});
@@ -146,7 +150,8 @@ export async function fetchMovieMeta(tmdbId: number): Promise<MovieMeta> {
 			.toSorted((a, b) => a.order - b.order)
 			.slice(0, 3)
 			.map((c) => c.name),
-		providers: summarizeProviders(d['watch/providers']?.results.HU)
+		providers: summarizeProviders(d['watch/providers']?.results.HU),
+		ageRating: pickAgeRating(d.release_dates?.results)
 	};
 }
 

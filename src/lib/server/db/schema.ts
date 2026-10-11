@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import type { Providers } from '#lib/server/providers.ts';
+import type { AgeRating } from '#lib/server/age-rating.ts';
 import { index, integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 const now = sql`(unixepoch() * 1000)`;
@@ -60,6 +61,8 @@ export type MovieMeta = {
 	cast?: string[];
 	/** Where it streams in Hungary (TMDB / JustWatch). Missing on movies cached before. */
 	providers?: Providers;
+	/** Minimum age (Hungarian rating, else German). Missing on movies cached before. */
+	ageRating?: AgeRating | null;
 };
 
 export const movies = sqliteTable(

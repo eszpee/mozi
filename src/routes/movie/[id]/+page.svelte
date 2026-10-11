@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import Poster from '#lib/components/Poster.svelte';
 	import AvailabilityBadge from '#lib/components/AvailabilityBadge.svelte';
+	import AgeBadge from '#lib/components/AgeBadge.svelte';
 	import VoteButtons from '#lib/components/VoteButtons.svelte';
 	import Avatar from '#lib/components/Avatar.svelte';
 	import Linkified from '#lib/components/Linkified.svelte';
@@ -77,7 +78,10 @@
 			<AvailabilityBadge status={movie.availability} variant="inline" />
 			<h1>{movie.title.main}</h1>
 			{#if movie.title.original}<p class="original">{movie.title.original}</p>{/if}
-			<p class="details">{details}</p>
+			<div class="details-row">
+				{#if movie.ageRating !== null}<AgeBadge age={movie.ageRating} />{/if}
+				<p class="details">{details}</p>
+			</div>
 			{#if languageName(movie.originalLanguage)}
 				<p class="details">Eredeti nyelv: {languageName(movie.originalLanguage)}</p>
 			{/if}
@@ -425,6 +429,12 @@
 		margin: 0;
 		font-size: 14px;
 		color: var(--text-muted);
+	}
+
+	.details-row {
+		display: flex;
+		align-items: center;
+		gap: 8px;
 	}
 
 	.providers {
