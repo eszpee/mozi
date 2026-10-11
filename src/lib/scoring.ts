@@ -7,7 +7,8 @@ export const SORTS = {
 	hated: 'Least hated',
 	controversial: 'Most controversial',
 	rated: 'Highest rated',
-	newest: 'Newest'
+	released: 'Newest release',
+	added: 'Recently added'
 } as const;
 export type SortKey = keyof typeof SORTS;
 
@@ -32,8 +33,11 @@ export function tally(votes: Vote[], voters?: ReadonlySet<number>): Tally {
 	return { up, meh, down, score: up - DOWN_WEIGHT * down };
 }
 
-/** `rating` is the TMDB rating (0–10), used by the "Highest rated" sort. */
-type Rankable = { tally: Tally; addedAt: number; rating?: number | null };
+/**
+ * `rating` is the TMDB rating (0–10); `released` is an ISO date or just a year.
+ * Both are optional and missing values sort last.
+ */
+type Rankable = { tally: Tally; addedAt: number; rating?: number | null; released?: string | null };
 
 const byNewest = (a: Rankable, b: Rankable) => b.addedAt - a.addedAt;
 
@@ -48,7 +52,8 @@ const COMPARATORS: Record<SortKey, (a: Rankable, b: Rankable) => number> = {
 	// Unrated movies go last.
 	rated: (a, b) =>
 		(b.rating ?? -1) - (a.rating ?? -1) || b.tally.score - a.tally.score || byNewest(a, b),
-	newest: byNewest
+	released: (a, b) => (b.released ?? '').localeCompare(a.released ?? '') || byNewest(a, b),
+	added: byNewest
 };
 
 function total(t: Tally) {

@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray, isNotNull, isNull, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, isNotNull, isNull, or, sql } from 'drizzle-orm';
 import { db, schema } from '#lib/server/db/index.ts';
 import type { Movie } from '#lib/server/db/schema.ts';
 import { displayTitle, type DisplayTitle } from '#lib/titles.ts';
@@ -14,6 +14,7 @@ export type MovieView = {
 	tmdbId: number;
 	title: DisplayTitle;
 	year: number | null;
+	releaseDate: string | null;
 	runtime: number | null;
 	genres: string[];
 	rating: number | null;
@@ -79,6 +80,7 @@ function buildViews(rows: Movie[], meId: number, voters?: ReadonlySet<number>): 
 			tmdbId: m.tmdbId,
 			title: displayTitle(m.meta),
 			year: m.meta.year,
+			releaseDate: m.meta.releaseDate ?? null,
 			runtime: m.meta.runtime,
 			genres: m.meta.genres,
 			rating: m.meta.rating,
@@ -314,7 +316,11 @@ export async function refreshStaleMeta(limit = 10) {
 		.where(
 			and(
 				isNull(schema.movies.deletedAt),
-				sql`${schema.movies.metaRefreshedAt} < ${Date.now() - WEEK}`
+				// Stale, or cached before `releaseDate` existed (a JSON null means TMDB has none).
+				or(
+					sql`${schema.movies.metaRefreshedAt} < ${Date.now() - WEEK}`,
+					sql`json_type(${schema.movies.meta}, '$.releaseDate') IS NULL`
+				)
 			)
 		)
 		.limit(limit)

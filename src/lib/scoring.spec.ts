@@ -57,8 +57,18 @@ describe('rank', () => {
 		expect(names(rank(rated, 'rated'))).toEqual(['c', 'd', 'a', 'b']);
 	});
 
-	it('newest sorts by date added', () => {
-		expect(names(rank([a, b, c, d], 'newest'))).toEqual(['d', 'c', 'b', 'a']);
+	it('newest release sorts by release date, then year-only, unknown last', () => {
+		const dated = [
+			{ ...a, released: '2023-05-01' },
+			{ ...b, released: null },
+			{ ...c, released: '1976' },
+			{ ...d, released: '2025-11-20' }
+		];
+		expect(names(rank(dated, 'released'))).toEqual(['d', 'a', 'c', 'b']);
+	});
+
+	it('recently added sorts by date added', () => {
+		expect(names(rank([a, b, c, d], 'added'))).toEqual(['d', 'c', 'b', 'a']);
 	});
 
 	it('scoping to attendees changes the order', () => {
@@ -70,7 +80,7 @@ describe('rank', () => {
 
 	it('does not mutate its input', () => {
 		const input = [a, b];
-		rank(input, 'newest');
+		rank(input, 'added');
 		expect(names(input)).toEqual(['a', 'b']);
 	});
 });

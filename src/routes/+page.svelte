@@ -19,7 +19,8 @@
 				movie: m,
 				tally: m.rankTally,
 				addedAt: m.addedAt,
-				rating: m.rating
+				rating: m.rating,
+				released: m.releaseDate ?? (m.year ? String(m.year) : null)
 			})),
 			data.sort
 		).map((r) => r.movie);
@@ -67,7 +68,7 @@
 	}
 
 	const sortKeys = Object.keys(SORTS) as SortKey[];
-	let rankShown = $derived(data.sort !== 'newest');
+	let rankShown = $derived(data.sort !== 'added');
 </script>
 
 <svelte:head><title>Picks · mozi</title></svelte:head>

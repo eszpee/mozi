@@ -44,6 +44,8 @@ export type MovieMeta = {
 	originalLanguage: string;
 	huTitle: string | null;
 	year: number | null;
+	/** ISO date; missing on movies cached before it was added. */
+	releaseDate?: string | null;
 	runtime: number | null;
 	genres: string[];
 	overview: string;
