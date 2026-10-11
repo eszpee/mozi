@@ -18,6 +18,8 @@ const PUBLIC_PREFIXES = ['/login', '/join/', '/auth/', '/healthz', '/robots.txt'
 
 const SECURITY_HEADERS: Record<string, string> = {
 	'x-robots-tag': 'noindex, nofollow',
+	// Only ever served over https in production (Cloudflare); browsers ignore it on http://localhost.
+	'strict-transport-security': 'max-age=31536000',
 	'x-content-type-options': 'nosniff',
 	'referrer-policy': 'strict-origin-when-cross-origin',
 	'permissions-policy': 'camera=(), microphone=(), geolocation=(), interest-cohort=()'

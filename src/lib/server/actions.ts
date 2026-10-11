@@ -30,6 +30,12 @@ export async function vote({ request, locals }: Event) {
 
 export async function seen({ request, locals }: Event) {
 	const { movieId } = await parseForm(request, z.object({ movieId: id }));
+	const movie = db
+		.select({ id: schema.movies.id })
+		.from(schema.movies)
+		.where(and(eq(schema.movies.id, movieId), isNull(schema.movies.deletedAt)))
+		.get();
+	if (!movie) error(404, 'Movie not found');
 	toggleSeen(movieId, locals.user!.id);
 }
 
