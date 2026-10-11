@@ -14,6 +14,8 @@ RUN npm run check \
  && npm prune --omit=dev
 
 FROM node:24-alpine
+# Zone data, so TZ (compose.yaml) also applies to shell tools and logs, not just Node.
+RUN apk add --no-cache tzdata
 WORKDIR /app
 ENV NODE_ENV=production \
     PORT=3000 \
