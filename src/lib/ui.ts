@@ -43,6 +43,20 @@ export function formatNightDate(iso: string | null) {
 	}).format(d);
 }
 
+const languageNames = new Intl.DisplayNames('hu-HU', { type: 'language' });
+
+/** TMDB's language code as a Hungarian name ("portugál"); null when unknown. */
+export function languageName(code: string | null | undefined): string | null {
+	if (!code || code === 'xx') return null; // xx: no language
+	try {
+		// TMDB uses the nonstandard "cn" for Cantonese.
+		const name = languageNames.of(code === 'cn' ? 'yue' : code);
+		return name && name !== code ? name : null;
+	} catch {
+		return null;
+	}
+}
+
 export function timeAgo(ms: number, now = Date.now()) {
 	const s = Math.round((now - ms) / 1000);
 	if (s < 60) return 'épp most';

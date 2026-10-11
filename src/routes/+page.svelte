@@ -67,8 +67,12 @@
 		return `${url.pathname}${url.search}`;
 	}
 
-	const sortKeys = Object.keys(SORTS) as SortKey[];
-	let rankShown = $derived(data.sort !== 'added');
+	// The overall pick | by votes | by the movie itself.
+	const SORT_GROUPS: SortKey[][] = [
+		['best'],
+		['liked', 'hated', 'controversial'],
+		['rated', 'released', 'added']
+	];
 </script>
 
 <svelte:head><title>Filmek · mozi</title></svelte:head>
@@ -114,13 +118,16 @@
 			</div>
 			<div class="sort-row">
 				<nav class="sorts" aria-label="Rendezés">
-					{#each sortKeys as key (key)}
-						<a
-							href={withParam('sort', key === 'best' ? null : key)}
-							aria-current={data.sort === key ? 'true' : undefined}
-							data-sveltekit-reset="false"
-							data-sveltekit-replacestate>{SORTS[key]}</a
-						>
+					{#each SORT_GROUPS as group, g (g)}
+						{#if g > 0}<span class="sep" aria-hidden="true"></span>{/if}
+						{#each group as key (key)}
+							<a
+								href={withParam('sort', key === 'best' ? null : key)}
+								aria-current={data.sort === key ? 'true' : undefined}
+								data-sveltekit-reset="false"
+								data-sveltekit-replacestate>{SORTS[key]}</a
+							>
+						{/each}
 					{/each}
 				</nav>
 				<button
@@ -153,7 +160,7 @@
 		<div class="grid">
 			{#each shown as movie, i (movie.id)}
 				<div class="cell" animate:flip={{ duration: 350 }}>
-					<MovieCard {movie} rank={rankShown ? i + 1 : null} eager={i < 4} />
+					<MovieCard {movie} eager={i < 4} />
 				</div>
 			{/each}
 		</div>
@@ -268,6 +275,15 @@
 		scrollbar-width: none;
 		margin-left: calc(-1 * var(--gutter));
 		padding-left: var(--gutter);
+	}
+
+	.sep {
+		flex: none;
+		align-self: center;
+		width: 1px;
+		height: 14px;
+		margin: 0 4px;
+		background: var(--line-strong);
 	}
 
 	.sorts a {

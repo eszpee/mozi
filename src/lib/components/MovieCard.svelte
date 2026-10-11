@@ -10,7 +10,6 @@
 	type Member = { id: number; nickname: string; avatarSeed: string };
 	let {
 		movie,
-		rank = null,
 		eager = false
 	}: {
 		movie: {
@@ -26,7 +25,6 @@
 			seenBy: Member[];
 			commentCount: number;
 		};
-		rank?: number | null;
 		eager?: boolean;
 	} = $props();
 
@@ -42,7 +40,6 @@
 		<div class="poster-wrap">
 			<Poster path={movie.posterPath} title={movie.title.main} {eager} />
 			<AvailabilityBadge status={movie.availability} />
-			{#if rank !== null}<span class="rank">{rank}</span>{/if}
 			{#if movie.myVote === null}<span class="new" title="Még nem szavaztál">új</span>{/if}
 		</div>
 		<h3 class="title">{movie.title.main}</h3>
@@ -96,22 +93,6 @@
 
 	.link:hover .poster-wrap {
 		transform: translateY(-3px);
-	}
-
-	.rank {
-		position: absolute;
-		bottom: 8px;
-		left: 8px;
-		min-width: 28px;
-		height: 28px;
-		padding: 0 6px;
-		display: grid;
-		place-items: center;
-		border-radius: 999px;
-		background: rgb(11 11 16 / 0.85);
-		font-family: var(--font-display);
-		font-weight: 800;
-		font-size: 14px;
 	}
 
 	.new {

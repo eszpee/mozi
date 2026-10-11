@@ -5,7 +5,15 @@
 	import VoteButtons from '#lib/components/VoteButtons.svelte';
 	import Avatar from '#lib/components/Avatar.svelte';
 	import Linkified from '#lib/components/Linkified.svelte';
-	import { formatDate, formatRuntime, posterUrl, timeAgo, trailerUrl, voteEmoji } from '#lib/ui.ts';
+	import {
+		formatDate,
+		formatRuntime,
+		languageName,
+		posterUrl,
+		timeAgo,
+		trailerUrl,
+		voteEmoji
+	} from '#lib/ui.ts';
 
 	let { data, form } = $props();
 	let movie = $derived(data.movie);
@@ -49,6 +57,9 @@
 			<h1>{movie.title.main}</h1>
 			{#if movie.title.original}<p class="original">{movie.title.original}</p>{/if}
 			<p class="details">{details}</p>
+			{#if languageName(movie.originalLanguage)}
+				<p class="details">Eredeti nyelv: {languageName(movie.originalLanguage)}</p>
+			{/if}
 			{#if movie.rating}<p class="rating">★ {movie.rating.toFixed(1)} <span>TMDB</span></p>{/if}
 			<div class="links">
 				{#if movie.imdbId}

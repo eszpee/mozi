@@ -13,6 +13,8 @@ export type MovieView = {
 	id: number;
 	tmdbId: number;
 	title: DisplayTitle;
+	/** TMDB's ISO 639-1 code. */
+	originalLanguage: string;
 	year: number | null;
 	releaseDate: string | null;
 	runtime: number | null;
@@ -79,6 +81,7 @@ function buildViews(rows: Movie[], meId: number, voters?: ReadonlySet<number>): 
 			id: m.id,
 			tmdbId: m.tmdbId,
 			title: displayTitle(m.meta),
+			originalLanguage: m.meta.originalLanguage,
 			year: m.meta.year,
 			releaseDate: m.meta.releaseDate ?? null,
 			runtime: m.meta.runtime,
