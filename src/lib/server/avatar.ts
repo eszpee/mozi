@@ -46,7 +46,7 @@ export function avatarSvg(seed: string): string {
 	return (
 		'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">' +
 		`<circle cx="32" cy="32" r="32" fill="${color}"/>` +
-		'<text x="32" y="34" font-size="36" text-anchor="middle" dominant-baseline="central" ' +
+		'<text x="32" y="32.5" font-size="36" text-anchor="middle" dominant-baseline="central" ' +
 		`font-family="'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif">${emoji}</text>` +
 		'</svg>'
 	);
