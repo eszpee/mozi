@@ -17,6 +17,11 @@ export function startBackgroundJobs() {
 	const refresh = run('metadata', () => refreshStaleMeta());
 
 	setTimeout(sync, 5_000).unref();
+	// After a deploy, catch up at once on everything outdated (e.g. fields added since).
+	setTimeout(
+		run('metadata', () => refreshStaleMeta(500)),
+		15_000
+	).unref();
 	setInterval(sync, 10 * MINUTE).unref();
 	setInterval(refresh, 60 * MINUTE).unref();
 }
