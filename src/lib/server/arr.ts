@@ -83,6 +83,14 @@ export function availabilityMap(): Map<number, 'plex' | 'downloading' | 'request
 	return new Map(rows.map((r) => [r.tmdbId, r.status]));
 }
 
+/** Shows a just-requested movie as "Keressük" until the next sync sees it in Radarr. */
+export function markRequested(tmdbId: number) {
+	db.insert(schema.availability)
+		.values({ tmdbId, status: 'requested' })
+		.onConflictDoNothing()
+		.run();
+}
+
 export function availabilityCount(): number {
 	return db.get<{ n: number }>(sql`select count(*) as n from availability`)?.n ?? 0;
 }

@@ -1,5 +1,5 @@
 import { SEERR_API_KEY, SEERR_URL } from '$app/env/private';
-import { syncAvailability } from './arr.ts';
+import { markRequested, syncAvailability } from './arr.ts';
 
 export const seerrConfigured = () => !!(SEERR_URL && SEERR_API_KEY);
 
@@ -19,7 +19,7 @@ export async function requestInSeerr(tmdbId: number): Promise<void> {
 	if (!res.ok && res.status !== 409) {
 		throw new Error(`Seerr request: ${res.status} ${await res.text()}`);
 	}
-	// Seerr adds it to Radarr asynchronously; pick up the new status shortly.
-	await syncAvailability();
-	setTimeout(() => void syncAvailability(), 5_000);
+	// Seerr adds it to Radarr asynchronously, so a sync right now would not see it yet.
+	markRequested(tmdbId);
+	setTimeout(() => void syncAvailability(), 15_000);
 }
