@@ -4,6 +4,7 @@
 	import Avatar from '#lib/components/Avatar.svelte';
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
+	import { afterNavigate } from '$app/navigation';
 	import type { LayoutProps } from './$types';
 
 	let { data, children }: LayoutProps = $props();
@@ -11,6 +12,12 @@
 	// Lets e2e tests wait until the page is interactive.
 	onMount(() => {
 		document.documentElement.dataset.hydrated = '';
+	});
+
+	// The account menu is a <details>; close it once a link in it (or anywhere) navigates.
+	let menu: HTMLDetailsElement | undefined = $state();
+	afterNavigate(() => {
+		if (menu) menu.open = false;
 	});
 
 	// Fixed time zone, so server and browser render the same text.
@@ -50,7 +57,7 @@
 			<a class="btn btn-primary btn-small add" href="/add" aria-label="Film ajánlása">
 				<span aria-hidden="true">＋</span><span class="add-label">Ajánlok</span>
 			</a>
-			<details class="me">
+			<details class="me" bind:this={menu}>
 				<summary aria-label="Fiókmenü">
 					<Avatar seed={data.me.avatarSeed} name={data.me.nickname} size={34} />
 				</summary>
