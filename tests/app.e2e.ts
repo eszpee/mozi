@@ -199,7 +199,7 @@ test.describe.serial('movie night', () => {
 		await card(bea, 'Dune: Part Two').getByRole('link').first().click();
 		await expect(bea).toHaveURL(/\/movie\/\d+$/);
 		await expect(bea.getByRole('button', { name: 'Törlés', exact: true })).toHaveCount(0);
-		await expect(bea.getByRole('button', { name: /Kérés Radarrban/ })).toHaveCount(0);
+		await expect(bea.getByRole('button', { name: /Töltsük le/ })).toHaveCount(0);
 		const res = await bea.request.post(`${bea.url()}?/remove`, {
 			headers: { 'x-sveltekit-action': 'true', origin: 'http://localhost:5174' },
 			form: {}

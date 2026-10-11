@@ -11,7 +11,7 @@ import {
 import { attendeeIds, openNight } from '#lib/server/nights.ts';
 import { activeMembers, toMember } from '#lib/server/users.ts';
 import { parseForm, seen, vote } from '#lib/server/actions.ts';
-import { radarrConfigured, requestMovie } from '#lib/server/arr.ts';
+import { requestInSeerr, seerrConfigured } from '#lib/server/seerr.ts';
 
 const movieId = (params: { id: string }) => {
 	const id = Number(params.id);
@@ -32,7 +32,7 @@ export function load({ params, locals }) {
 		attendees: activeMembers()
 			.filter((m) => attending.has(m.id))
 			.map(toMember),
-		canRequest: locals.admin && radarrConfigured() && movie.availability === null,
+		canRequest: locals.admin && seerrConfigured() && movie.availability === null,
 		admin: locals.admin
 	};
 }
@@ -72,10 +72,10 @@ export const actions = {
 		const movie = getMovie(movieId(params), locals.user!.id);
 		if (!movie) error(404, 'Nincs ilyen film');
 		try {
-			await requestMovie(movie.tmdbId);
+			await requestInSeerr(movie.tmdbId);
 		} catch (e) {
-			console.error('Radarr request failed', e);
-			return fail(502, { requestError: 'A Radarr nem fogadta el a kérést.' });
+			console.error('Seerr request failed', e);
+			return fail(502, { requestError: 'A Seerr nem fogadta el a kérést.' });
 		}
 	},
 	remove: ({ params, locals }) => {

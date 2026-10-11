@@ -157,7 +157,7 @@
 
 		{#if data.canRequest}
 			<form method="POST" action="?/request" use:enhance>
-				<button class="btn btn-small" type="submit">＋ Kérés Radarrban</button>
+				<button class="btn btn-small" type="submit">⬇ Töltsük le</button>
 			</form>
 		{/if}
 		{#if form?.requestError}<p class="error-text">{form.requestError}</p>{/if}

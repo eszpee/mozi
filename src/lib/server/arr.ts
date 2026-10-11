@@ -1,12 +1,5 @@
 import { sql } from 'drizzle-orm';
-import {
-	PLEX_TOKEN,
-	PLEX_URL,
-	RADARR_API_KEY,
-	RADARR_QUALITY_PROFILE_ID,
-	RADARR_ROOT_FOLDER,
-	RADARR_URL
-} from '$app/env/private';
+import { PLEX_TOKEN, PLEX_URL, RADARR_API_KEY, RADARR_URL } from '$app/env/private';
 import { db, schema } from '#lib/server/db/index.ts';
 import {
 	computeAvailability,
@@ -83,50 +76,6 @@ export async function syncAvailability(): Promise<SyncResult> {
 		lastSync = { at: Date.now(), count: lastSync?.count ?? 0, error: String(e) };
 	}
 	return lastSync;
-}
-
-async function qualityProfileId(): Promise<number> {
-	if (RADARR_QUALITY_PROFILE_ID) return Number(RADARR_QUALITY_PROFILE_ID);
-	const profiles = await radarr<{ id: number; name: string }[]>('/qualityprofile');
-	const preferred = profiles.find((p) => p.name === 'Original') ?? profiles[0];
-	if (!preferred) throw new Error('Radarr has no quality profiles');
-	return preferred.id;
-}
-
-/** Adds the movie to Radarr (monitored, search immediately), the same way Seerr does. */
-export async function requestMovie(tmdbId: number): Promise<void> {
-	if (!radarrConfigured()) throw new Error('Radarr is not configured');
-	const existing = await radarr<(RadarrMovie & Record<string, unknown>)[]>(
-		`/movie?tmdbId=${tmdbId}`
-	);
-	const known = existing[0];
-	if (known && !known.hasFile) {
-		// Known to Radarr but not wanted (yet): monitor it and search now.
-		if (!known.monitored) {
-			await radarr(`/movie/${known.id}`, {
-				method: 'PUT',
-				body: JSON.stringify({ ...known, monitored: true })
-			});
-		}
-		await radarr('/command', {
-			method: 'POST',
-			body: JSON.stringify({ name: 'MoviesSearch', movieIds: [known.id] })
-		});
-	} else if (!known) {
-		const lookup = await radarr<Record<string, unknown>>(`/movie/lookup/tmdb?tmdbId=${tmdbId}`);
-		await radarr('/movie', {
-			method: 'POST',
-			body: JSON.stringify({
-				...lookup,
-				qualityProfileId: await qualityProfileId(),
-				rootFolderPath: RADARR_ROOT_FOLDER,
-				monitored: true,
-				minimumAvailability: 'released',
-				addOptions: { searchForMovie: true }
-			})
-		});
-	}
-	await syncAvailability();
 }
 
 export function availabilityMap(): Map<number, 'plex' | 'downloading' | 'requested'> {

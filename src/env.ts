@@ -19,13 +19,13 @@ export const variables = defineEnvVars({
 		schema: optional
 	},
 	RADARR_API_KEY: { description: 'Radarr API key.', schema: optional },
-	RADARR_QUALITY_PROFILE_ID: {
-		description: 'Radarr quality profile id used for requests.',
+	SEERR_URL: {
+		description: 'Seerr base URL for the admin download button, e.g. http://seerr.example:5055.',
 		schema: optional
 	},
-	RADARR_ROOT_FOLDER: {
-		description: 'Radarr root folder for requests.',
-		schema: (value) => value ?? '/data/hdd-media/movies'
+	SEERR_API_KEY: {
+		description: 'Seerr API key (requests are made as its admin).',
+		schema: optional
 	},
 	PLEX_URL: { description: 'Plex base URL, e.g. http://plex.example:32400.', schema: optional },
 	PLEX_TOKEN: { description: 'Plex token.', schema: optional },
