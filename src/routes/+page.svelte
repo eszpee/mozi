@@ -3,6 +3,7 @@
 	import MovieCard from '#lib/components/MovieCard.svelte';
 	import NightStrip from '#lib/components/NightStrip.svelte';
 	import { flip } from 'svelte/animate';
+	import { refreshAll } from '$app/navigation';
 	import { SORTS, rank, type SortKey } from '#lib/scoring.ts';
 	import { stableOrder } from '#lib/stable-order.ts';
 
@@ -20,8 +21,22 @@
 	});
 
 	// Votes refresh the data, but cards keep their place until the view changes
-	// (sort, scope, filter) or the page is loaded again.
-	let viewKey = $derived(`${data.sort}|${data.scope}|${data.needsVote}|${data.inPlex}`);
+	// (sort, scope, filter), the page is loaded again, or the refresh button is tapped.
+	let refreshes = $state(0);
+	let refreshing = $state(false);
+	let viewKey = $derived(
+		`${data.sort}|${data.scope}|${data.needsVote}|${data.inPlex}|${refreshes}`
+	);
+
+	async function refresh() {
+		refreshing = true;
+		try {
+			await refreshAll();
+			refreshes++;
+		} finally {
+			refreshing = false;
+		}
+	}
 	let memory = { ids: [] as number[], key: '' };
 	let order = $derived.by(() => {
 		const freshIds = fresh.map((m) => m.id);
@@ -91,16 +106,37 @@
 					>
 				</div>
 			</div>
-			<nav class="sorts" aria-label="Sort">
-				{#each sortKeys as key (key)}
-					<a
-						href={withParam('sort', key === 'best' ? null : key)}
-						aria-current={data.sort === key ? 'true' : undefined}
-						data-sveltekit-reset="false"
-						data-sveltekit-replacestate>{SORTS[key]}</a
-					>
-				{/each}
-			</nav>
+			<div class="sort-row">
+				<nav class="sorts" aria-label="Sort">
+					{#each sortKeys as key (key)}
+						<a
+							href={withParam('sort', key === 'best' ? null : key)}
+							aria-current={data.sort === key ? 'true' : undefined}
+							data-sveltekit-reset="false"
+							data-sveltekit-replacestate>{SORTS[key]}</a
+						>
+					{/each}
+				</nav>
+				<button
+					class="refresh"
+					class:spin={refreshing}
+					type="button"
+					onclick={refresh}
+					aria-label="Refresh"
+					title="Refresh"
+				>
+					<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+						<path
+							d="M20 12a8 8 0 1 1-2.34-5.66M20 4v4.5h-4.5"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
+					</svg>
+				</button>
+			</div>
 			{#if data.scope === 'night' && data.night.attendees.length === 0}
 				<p class="note">Nobody’s marked as coming yet, so everyone’s votes count.</p>
 			{/if}
@@ -211,13 +247,21 @@
 		text-align: center;
 	}
 
+	.sort-row {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+	}
+
 	.sorts {
+		flex: 1;
+		min-width: 0;
 		display: flex;
 		gap: 4px;
 		overflow-x: auto;
 		scrollbar-width: none;
-		margin: 0 calc(-1 * var(--gutter));
-		padding: 0 var(--gutter);
+		margin-left: calc(-1 * var(--gutter));
+		padding-left: var(--gutter);
 	}
 
 	.sorts a {
@@ -233,6 +277,34 @@
 	.sorts a[aria-current='true'] {
 		color: var(--text);
 		background: var(--surface);
+	}
+
+	.refresh {
+		flex: none;
+		width: 34px;
+		height: 34px;
+		display: grid;
+		place-items: center;
+		border-radius: 999px;
+		border: 0;
+		background: transparent;
+		color: var(--text-faint);
+		cursor: pointer;
+		transition: color 0.15s;
+	}
+
+	.refresh:hover {
+		color: var(--text);
+	}
+
+	.refresh.spin svg {
+		animation: spin 0.6s linear infinite;
+	}
+
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
 	}
 
 	.note {

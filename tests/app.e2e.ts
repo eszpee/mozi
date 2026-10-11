@@ -111,6 +111,10 @@ test.describe.serial('movie night', () => {
 		).toBeVisible();
 		// No jumping around while voting.
 		expect(await bea.locator('article.movie h3').allTextContents()).toEqual(before);
+		// The refresh button re-ranks in place.
+		await bea.getByRole('button', { name: 'Refresh' }).click();
+		await expect(bea.locator('article.movie h3').first()).toHaveText('Kontroll');
+		await expect(bea.locator('article.movie h3').last()).toHaveText('Amélie');
 
 		await go(bea, '/');
 		const titles = await bea.locator('article.movie h3').allTextContents();
