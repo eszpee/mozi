@@ -266,12 +266,22 @@ test.describe.serial('movie night', () => {
 	});
 
 	test('pages fit a phone screen without horizontal scrolling', async () => {
-		for (const path of ['/', '/add', '/watched', '/night', '/admin']) {
-			await go(admin, path);
-			const overflow = await admin.evaluate(
-				() => document.documentElement.scrollWidth - document.documentElement.clientWidth
-			);
-			expect(overflow, path).toBeLessThanOrEqual(0);
+		await go(admin, '/');
+		const movie = await card(admin, 'Amélie').getByRole('link').first().getAttribute('href');
+		for (const width of [320, 375, 402, 412]) {
+			await admin.setViewportSize({ width, height: 800 });
+			for (const path of ['/', movie!, '/add', '/watched', '/night', '/admin']) {
+				await go(admin, path);
+				// Nothing may stick out to the right, even if clipped (iOS Safari pans to it).
+				const sticking = await admin.evaluate(() => {
+					const vw = document.documentElement.clientWidth;
+					return [...document.querySelectorAll('body *')]
+						.filter((e) => !e.closest('.sorts, .hero'))
+						.filter((e) => e.getBoundingClientRect().right > vw + 0.5)
+						.map((e) => e.className);
+				});
+				expect(sticking, `${width}px ${path}`).toEqual([]);
+			}
 		}
 	});
 });

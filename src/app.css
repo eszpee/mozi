@@ -46,10 +46,15 @@
 
 html {
 	-webkit-text-size-adjust: 100%;
+	/* The page never scrolls sideways (iOS Safari otherwise pans and bounces when
+	   anything pokes out). `clip`, unlike `hidden`, keeps the sticky header working. */
+	overflow-x: clip;
+	overscroll-behavior-x: none;
 }
 
 body {
 	margin: 0;
+	overflow-x: clip;
 	min-height: 100dvh;
 	background:
 		radial-gradient(1200px 600px at 20% -10%, rgb(245 181 68 / 0.07), transparent 60%),

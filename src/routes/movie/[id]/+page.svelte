@@ -299,6 +299,8 @@
 	.hero {
 		position: relative;
 		overflow: hidden;
+		/* Safari can leak a blurred child past overflow: hidden; paint containment can't. */
+		contain: paint;
 		border-bottom: 1px solid var(--line);
 	}
 
