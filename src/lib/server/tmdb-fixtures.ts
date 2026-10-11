@@ -22,7 +22,12 @@ export const FIXTURE_MOVIES: { tmdbId: number; meta: MovieMeta }[] = [
 			imdbId: 'tt0211915',
 			trailerKey: '555A7T_kmIc',
 			directors: ['Jean-Pierre Jeunet'],
-			cast: ['Audrey Tautou', 'Mathieu Kassovitz', 'Rufus']
+			cast: ['Audrey Tautou', 'Mathieu Kassovitz', 'Rufus'],
+			providers: {
+				link: null,
+				stream: [],
+				rent: [{ name: 'Apple TV', logo: '/9ghgSC0MA082EL6HLCW3GalykFD.jpg' }]
+			}
 		}
 	},
 	{
@@ -42,7 +47,8 @@ export const FIXTURE_MOVIES: { tmdbId: number; meta: MovieMeta }[] = [
 			imdbId: 'tt0373981',
 			trailerKey: 'Dx5Rt2BPLLc',
 			directors: ['Nimród Antal'],
-			cast: ['Sándor Csányi', 'Zoltán Mucsi', 'Csaba Pindroch']
+			cast: ['Sándor Csányi', 'Zoltán Mucsi', 'Csaba Pindroch'],
+			providers: { link: null, stream: [], rent: [] }
 		}
 	},
 	{
@@ -62,7 +68,8 @@ export const FIXTURE_MOVIES: { tmdbId: number; meta: MovieMeta }[] = [
 			imdbId: 'tt3808342',
 			trailerKey: 'PSabBa9IWYs',
 			directors: ['László Nemes'],
-			cast: ['Géza Röhrig', 'Levente Molnár', 'Urs Rechn']
+			cast: ['Géza Röhrig', 'Levente Molnár', 'Urs Rechn'],
+			providers: { link: null, stream: [], rent: [] }
 		}
 	},
 	{
@@ -82,7 +89,8 @@ export const FIXTURE_MOVIES: { tmdbId: number; meta: MovieMeta }[] = [
 			imdbId: 'tt15239678',
 			trailerKey: 'U2Qp5pL3ovA',
 			directors: ['Denis Villeneuve'],
-			cast: ['Timothée Chalamet', 'Zendaya', 'Rebecca Ferguson']
+			cast: ['Timothée Chalamet', 'Zendaya', 'Rebecca Ferguson'],
+			providers: { link: null, stream: [], rent: [] }
 		}
 	},
 	{
@@ -102,7 +110,8 @@ export const FIXTURE_MOVIES: { tmdbId: number; meta: MovieMeta }[] = [
 			imdbId: 'tt0050083',
 			trailerKey: 'TEN-2uTi2c0',
 			directors: ['Sidney Lumet'],
-			cast: ['Henry Fonda', 'Lee J. Cobb', 'Martin Balsam']
+			cast: ['Henry Fonda', 'Lee J. Cobb', 'Martin Balsam'],
+			providers: { link: null, stream: [], rent: [] }
 		}
 	},
 	{
@@ -122,7 +131,15 @@ export const FIXTURE_MOVIES: { tmdbId: number; meta: MovieMeta }[] = [
 			imdbId: 'tt1375666',
 			trailerKey: 'cdx31ak4KbQ',
 			directors: ['Christopher Nolan'],
-			cast: ['Leonardo DiCaprio', 'Joseph Gordon-Levitt', 'Ken Watanabe']
+			cast: ['Leonardo DiCaprio', 'Joseph Gordon-Levitt', 'Ken Watanabe'],
+			providers: {
+				link: null,
+				stream: [{ name: 'Netflix', logo: '/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg' }],
+				rent: [
+					{ name: 'Apple TV', logo: '/9ghgSC0MA082EL6HLCW3GalykFD.jpg' },
+					{ name: 'Google Play Movies', logo: '/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg' }
+				]
+			}
 		}
 	}
 ];

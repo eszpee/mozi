@@ -13,6 +13,9 @@ export function posterUrl(path: string | null, width: 185 | 342 | 500 | 780 = 34
 	return path ? `https://image.tmdb.org/t/p/w${width}${path}` : null;
 }
 
+/** A TMDB watch-provider logo (square). */
+export const providerLogoUrl = (path: string) => `https://image.tmdb.org/t/p/w92${path}`;
+
 export function formatRuntime(minutes: number | null) {
 	if (!minutes) return null;
 	const h = Math.floor(minutes / 60);

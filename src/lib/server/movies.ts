@@ -6,6 +6,7 @@ import { tally, type Tally, type VoteValue } from '#lib/scoring.ts';
 import { toMember, type Member } from '#lib/server/users.ts';
 import { availabilityMap } from '#lib/server/arr.ts';
 import type { AvailabilityStatus } from '#lib/server/availability.ts';
+import type { Providers } from '#lib/server/providers.ts';
 import { fetchMovieMeta } from '#lib/server/tmdb.ts';
 import { closeNightWith, openNight } from '#lib/server/nights.ts';
 
@@ -26,6 +27,7 @@ export type MovieView = {
 	trailerKey: string | null;
 	directors: string[];
 	cast: string[];
+	providers: Providers;
 	addedAt: number;
 	addedBy: Member;
 	watchedAt: number | null;
@@ -97,6 +99,7 @@ function buildViews(rows: Movie[], meId: number, voters?: ReadonlySet<number>): 
 			trailerKey: m.meta.trailerKey,
 			directors: m.meta.directors ?? [],
 			cast: m.meta.cast ?? [],
+			providers: m.meta.providers ?? { link: null, stream: [], rent: [] },
 			addedAt: m.addedAt.getTime(),
 			addedBy: member(m.addedBy),
 			watchedAt: m.watchedAt?.getTime() ?? null,
@@ -327,11 +330,12 @@ export async function refreshStaleMeta(limit = 10) {
 		.where(
 			and(
 				isNull(schema.movies.deletedAt),
-				// Stale, or cached before `releaseDate` / credits existed (a JSON null means TMDB has none).
+				// Stale, or cached before `releaseDate` / credits / providers existed (a JSON null means TMDB has none).
 				or(
 					sql`${schema.movies.metaRefreshedAt} < ${Date.now() - WEEK}`,
 					sql`json_type(${schema.movies.meta}, '$.releaseDate') IS NULL`,
-					sql`json_type(${schema.movies.meta}, '$.cast') IS NULL`
+					sql`json_type(${schema.movies.meta}, '$.cast') IS NULL`,
+					sql`json_type(${schema.movies.meta}, '$.providers') IS NULL`
 				)
 			)
 		)

@@ -10,6 +10,7 @@
 		formatRuntime,
 		languageName,
 		posterUrl,
+		providerLogoUrl,
 		timeAgo,
 		trailerUrl,
 		voteEmoji
@@ -35,6 +36,14 @@
 		{ emoji: '👎', people: movie.votes.filter((v) => v.value === -1) }
 	]);
 	let watched = $derived(movie.watchedAt !== null);
+	// Our own Plex first: if it's downloaded, that's the easiest way to watch it.
+	let streams = $derived([
+		...(movie.availability === 'plex' ? [{ name: 'Plex', src: '/providers/plex.svg' }] : []),
+		...movie.providers.stream.map((p) => ({ name: p.name, src: providerLogoUrl(p.logo) }))
+	]);
+	let rentals = $derived(
+		movie.providers.rent.map((p) => ({ name: p.name, src: providerLogoUrl(p.logo) }))
+	);
 </script>
 
 <svelte:head><title>{movie.title.main} · mozi</title></svelte:head>
@@ -67,6 +76,24 @@
 			{/if}
 			{#if movie.cast.length}
 				<p class="details">Főszereplők: {movie.cast.join(', ')}</p>
+			{/if}
+			{#each [{ label: 'Elérhető', list: streams }, { label: 'Bérelhető', list: rentals }] as row (row.label)}
+				{#if row.list.length}
+					<div class="providers">
+						<span class="details">{row.label}:</span>
+						{#each row.list as p (p.name)}
+							<img src={p.src} alt={p.name} title={p.name} width="28" height="28" loading="lazy" />
+						{/each}
+					</div>
+				{/if}
+			{/each}
+			{#if movie.providers.stream.length || movie.providers.rent.length}
+				<a
+					class="justwatch"
+					href={movie.providers.link ?? 'https://www.justwatch.com/hu'}
+					target="_blank"
+					rel="noopener noreferrer">Forrás: JustWatch</a
+				>
 			{/if}
 			{#if movie.rating}<p class="rating">★ {movie.rating.toFixed(1)} <span>TMDB</span></p>{/if}
 			<div class="links">
@@ -377,6 +404,28 @@
 		margin: 0;
 		font-size: 14px;
 		color: var(--text-muted);
+	}
+
+	.providers {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 6px;
+	}
+
+	.providers .details {
+		margin-right: 2px;
+	}
+
+	.providers img {
+		border-radius: 7px;
+		background: var(--surface);
+	}
+
+	.justwatch {
+		font-size: 11px;
+		color: var(--text-faint);
+		text-decoration: none;
 	}
 
 	.rating {

@@ -1,4 +1,5 @@
 import { sql } from 'drizzle-orm';
+import type { Providers } from '#lib/server/providers.ts';
 import { index, integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 const now = sql`(unixepoch() * 1000)`;
@@ -57,6 +58,8 @@ export type MovieMeta = {
 	directors?: string[];
 	/** Top-billed cast, at most three. */
 	cast?: string[];
+	/** Where it streams in Hungary (TMDB / JustWatch). Missing on movies cached before. */
+	providers?: Providers;
 };
 
 export const movies = sqliteTable(
