@@ -2,7 +2,7 @@ import { dev } from '$app/env';
 import { TMDB_TOKEN } from '$app/env/private';
 import type { MovieMeta } from '#lib/server/db/schema.ts';
 import { FIXTURE_MOVIES } from './tmdb-fixtures.ts';
-import { summarizeProviders, type TmdbCountryProviders } from './providers.ts';
+import { parseWatchLinks, summarizeProviders, type TmdbCountryProviders } from './providers.ts';
 import { pickAgeRating } from './age-rating.ts';
 
 const API = 'https://api.themoviedb.org/3';
@@ -101,6 +101,20 @@ type TmdbDetails = {
 	credits?: { cast: { name: string; order: number }[]; crew: { name: string; job: string }[] };
 };
 
+/** Deep links from TMDB's public watch page; empty if it can't be read (logos then fall back to search). */
+async function watchPageLinks(url: string | undefined): Promise<Map<number, string>> {
+	if (!url) return new Map();
+	try {
+		// Node's own user agent: a browser-like one from a non-browser gets a 403.
+		const res = await fetch(url, { signal: AbortSignal.timeout(10_000) });
+		if (!res.ok) throw new Error(`${res.status}`);
+		return parseWatchLinks(await res.text());
+	} catch (e) {
+		console.error(`TMDB watch page ${url}`, e);
+		return new Map();
+	}
+}
+
 /** Picks the most fitting YouTube trailer: official trailers first, then teasers. */
 function pickTrailer(videos: NonNullable<TmdbDetails['videos']>['results'], language: string) {
 	const yt = videos.filter((v) => v.site === 'YouTube');
@@ -123,6 +137,7 @@ export async function fetchMovieMeta(tmdbId: number): Promise<MovieMeta> {
 		include_video_language: 'en,hu,null',
 		include_image_language: 'hu,en,null'
 	});
+	const huWatch = d['watch/providers']?.results.HU;
 	const hu = d.translations?.translations.find((t) => t.iso_639_1 === 'hu');
 	const isHungarian = d.original_language === 'hu';
 	// Hungarian films get their Hungarian poster when TMDB has one.
@@ -150,7 +165,7 @@ export async function fetchMovieMeta(tmdbId: number): Promise<MovieMeta> {
 			.toSorted((a, b) => a.order - b.order)
 			.slice(0, 3)
 			.map((c) => c.name),
-		providers: summarizeProviders(d['watch/providers']?.results.HU),
+		watch: summarizeProviders(huWatch, await watchPageLinks(huWatch?.link)),
 		ageRating: pickAgeRating(d.release_dates?.results)
 	};
 }

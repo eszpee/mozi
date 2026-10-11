@@ -101,7 +101,7 @@ function buildViews(rows: Movie[], meId: number, voters?: ReadonlySet<number>): 
 			trailerKey: m.meta.trailerKey,
 			directors: m.meta.directors ?? [],
 			cast: m.meta.cast ?? [],
-			providers: m.meta.providers ?? { link: null, stream: [], rent: [] },
+			providers: m.meta.watch ?? { link: null, stream: [], rent: [] },
 			ageRating: m.meta.ageRating ?? null,
 			addedAt: m.addedAt.getTime(),
 			addedBy: member(m.addedBy),
@@ -338,7 +338,7 @@ export async function refreshStaleMeta(limit = 10) {
 					sql`${schema.movies.metaRefreshedAt} < ${Date.now() - WEEK}`,
 					sql`json_type(${schema.movies.meta}, '$.releaseDate') IS NULL`,
 					sql`json_type(${schema.movies.meta}, '$.cast') IS NULL`,
-					sql`json_type(${schema.movies.meta}, '$.providers') IS NULL`,
+					sql`json_type(${schema.movies.meta}, '$.watch') IS NULL`,
 					sql`json_type(${schema.movies.meta}, '$.ageRating') IS NULL`
 				)
 			)

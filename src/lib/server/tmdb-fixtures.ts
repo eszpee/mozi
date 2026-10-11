@@ -23,10 +23,10 @@ export const FIXTURE_MOVIES: { tmdbId: number; meta: MovieMeta }[] = [
 			trailerKey: '555A7T_kmIc',
 			directors: ['Jean-Pierre Jeunet'],
 			cast: ['Audrey Tautou', 'Mathieu Kassovitz', 'Rufus'],
-			providers: {
+			watch: {
 				link: null,
 				stream: [],
-				rent: [{ name: 'Apple TV', logo: '/9ghgSC0MA082EL6HLCW3GalykFD.jpg' }]
+				rent: [{ name: 'Apple TV', logo: '/9ghgSC0MA082EL6HLCW3GalykFD.jpg', url: null }]
 			},
 			ageRating: 12
 		}
@@ -49,7 +49,7 @@ export const FIXTURE_MOVIES: { tmdbId: number; meta: MovieMeta }[] = [
 			trailerKey: 'Dx5Rt2BPLLc',
 			directors: ['Nimród Antal'],
 			cast: ['Sándor Csányi', 'Zoltán Mucsi', 'Csaba Pindroch'],
-			providers: { link: null, stream: [], rent: [] },
+			watch: { link: null, stream: [], rent: [] },
 			ageRating: 16
 		}
 	},
@@ -71,7 +71,7 @@ export const FIXTURE_MOVIES: { tmdbId: number; meta: MovieMeta }[] = [
 			trailerKey: 'PSabBa9IWYs',
 			directors: ['László Nemes'],
 			cast: ['Géza Röhrig', 'Levente Molnár', 'Urs Rechn'],
-			providers: { link: null, stream: [], rent: [] },
+			watch: { link: null, stream: [], rent: [] },
 			ageRating: 16
 		}
 	},
@@ -93,7 +93,7 @@ export const FIXTURE_MOVIES: { tmdbId: number; meta: MovieMeta }[] = [
 			trailerKey: 'U2Qp5pL3ovA',
 			directors: ['Denis Villeneuve'],
 			cast: ['Timothée Chalamet', 'Zendaya', 'Rebecca Ferguson'],
-			providers: { link: null, stream: [], rent: [] },
+			watch: { link: null, stream: [], rent: [] },
 			ageRating: 12
 		}
 	},
@@ -115,7 +115,7 @@ export const FIXTURE_MOVIES: { tmdbId: number; meta: MovieMeta }[] = [
 			trailerKey: 'TEN-2uTi2c0',
 			directors: ['Sidney Lumet'],
 			cast: ['Henry Fonda', 'Lee J. Cobb', 'Martin Balsam'],
-			providers: { link: null, stream: [], rent: [] },
+			watch: { link: null, stream: [], rent: [] },
 			ageRating: 0
 		}
 	},
@@ -137,12 +137,12 @@ export const FIXTURE_MOVIES: { tmdbId: number; meta: MovieMeta }[] = [
 			trailerKey: 'cdx31ak4KbQ',
 			directors: ['Christopher Nolan'],
 			cast: ['Leonardo DiCaprio', 'Joseph Gordon-Levitt', 'Ken Watanabe'],
-			providers: {
+			watch: {
 				link: null,
-				stream: [{ name: 'Netflix', logo: '/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg' }],
+				stream: [{ name: 'Netflix', logo: '/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg', url: null }],
 				rent: [
-					{ name: 'Apple TV', logo: '/9ghgSC0MA082EL6HLCW3GalykFD.jpg' },
-					{ name: 'Google Play Movies', logo: '/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg' }
+					{ name: 'Apple TV', logo: '/9ghgSC0MA082EL6HLCW3GalykFD.jpg', url: null },
+					{ name: 'Google Play Movies', logo: '/8z7rC8uIDaTM91X0ZfkRf04ydj2.jpg', url: null }
 				]
 			},
 			ageRating: 12

@@ -39,10 +39,10 @@
 	]);
 	let watched = $derived(movie.watchedAt !== null);
 	// Our own Plex first: if it's downloaded, that's the easiest way to watch it.
-	const logo = (p: { name: string; logo: string }) => ({
+	const logo = (p: { name: string; logo: string; url: string | null }) => ({
 		name: p.name,
 		src: providerLogoUrl(p.logo),
-		href: providerUrl(p.name, movie.title.main, movie.providers.link)
+		href: p.url ?? providerUrl(p.name, movie.title.main, movie.providers.link)
 	});
 	let streams = $derived([
 		...(movie.availability === 'plex'

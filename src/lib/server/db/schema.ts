@@ -59,8 +59,8 @@ export type MovieMeta = {
 	directors?: string[];
 	/** Top-billed cast, at most three. */
 	cast?: string[];
-	/** Where it streams in Hungary (TMDB / JustWatch). Missing on movies cached before. */
-	providers?: Providers;
+	/** Where it streams in Hungary (TMDB / JustWatch), with deep links. Missing on movies cached before. */
+	watch?: Providers;
 	/** Minimum age (Hungarian rating, else German). Missing on movies cached before. */
 	ageRating?: AgeRating | null;
 };
