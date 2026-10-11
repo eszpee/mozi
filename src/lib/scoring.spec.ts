@@ -35,6 +35,25 @@ describe('rank', () => {
 		expect(names(rank([a, b, c, d], 'best'))).toEqual(['b', 'a', 'd', 'c']);
 	});
 
+	it('best bet rewards more people being fine with a movie', () => {
+		const few = item('few', votes(1), 1);
+		const many = item('many', votes(1, 0, 0), 2);
+		expect(names(rank([many, few], 'best'))).toEqual(['many', 'few']);
+	});
+
+	it('best bet uses the TMDB rating to break near-ties, never to beat a thumbs-up', () => {
+		const good = { ...item('good', votes(1), 1), rating: 8.5 };
+		const meh = { ...item('meh', votes(1), 2), rating: 5.5 };
+		const liked = { ...item('liked', votes(1, 1), 3), rating: 5 };
+		const great = { ...item('great', votes(1), 4), rating: 9 };
+		expect(names(rank([meh, good, liked, great], 'best'))).toEqual([
+			'liked',
+			'great',
+			'good',
+			'meh'
+		]);
+	});
+
 	it('most liked sorts by thumbs-up, fewer thumbs-down first on ties', () => {
 		expect(names(rank([a, b, c, d], 'liked'))).toEqual(['a', 'b', 'c', 'd']);
 	});

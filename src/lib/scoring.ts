@@ -19,6 +19,20 @@ export type Tally = { up: number; meh: number; down: number; score: number };
 /** A 👎 weighs more than a 👍: one strong veto should sink a movie faster than one fan lifts it. */
 export const DOWN_WEIGHT = 1.5;
 
+/**
+ * "Best bet" weights. Votes dominate: a 🤷 is a small plus (more people fine with it
+ * beats fewer voters), and the TMDB rating only breaks near-ties: even a 4-point
+ * rating gap (0.8) is worth less than one 👍.
+ */
+export const MEH_WEIGHT = 0.25;
+export const RATING_WEIGHT = 0.2;
+export const RATING_PIVOT = 6.5;
+
+export function bestBetScore(t: Tally, rating?: number | null): number {
+	const ratingBonus = rating == null ? 0 : RATING_WEIGHT * (rating - RATING_PIVOT);
+	return t.up + MEH_WEIGHT * t.meh - DOWN_WEIGHT * t.down + ratingBonus;
+}
+
 /** Counts votes, optionally only those cast by `voters` (e.g. the next night's attendees). */
 export function tally(votes: Vote[], voters?: ReadonlySet<number>): Tally {
 	let up = 0;
@@ -42,7 +56,10 @@ type Rankable = { tally: Tally; addedAt: number; rating?: number | null; release
 const byNewest = (a: Rankable, b: Rankable) => b.addedAt - a.addedAt;
 
 const COMPARATORS: Record<SortKey, (a: Rankable, b: Rankable) => number> = {
-	best: (a, b) => b.tally.score - a.tally.score || b.tally.up - a.tally.up || byNewest(a, b),
+	best: (a, b) =>
+		bestBetScore(b.tally, b.rating) - bestBetScore(a.tally, a.rating) ||
+		b.tally.up - a.tally.up ||
+		byNewest(a, b),
 	liked: (a, b) => b.tally.up - a.tally.up || a.tally.down - b.tally.down || byNewest(a, b),
 	hated: (a, b) => a.tally.down - b.tally.down || b.tally.up - a.tally.up || byNewest(a, b),
 	controversial: (a, b) =>

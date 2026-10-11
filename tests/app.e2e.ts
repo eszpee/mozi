@@ -168,7 +168,8 @@ test.describe.serial('movie night', () => {
 		// Only Peter counts now: Bea's 👎 on Amélie no longer sinks it.
 		const titles = await admin.locator('article.movie h3').allTextContents();
 		expect(titles.slice(0, 2).sort()).toEqual(['Amélie', 'Kontroll']);
-		expect(titles.at(-1)).toBe('Dune: Part Two');
+		// Peter voted on neither of the others; the better TMDB rating (Dune) goes first.
+		expect(titles.slice(2)).toEqual(['Dune: Part Two', 'Saul fia']);
 	});
 
 	test('comments form one thread with the author’s vote', async () => {
