@@ -14,7 +14,8 @@
 
 	let attending = $derived(new Set(night.attendees));
 	let heading = $derived(
-		[night.label, formatNightDate(night.date)].filter(Boolean).join(' · ') || 'Időpont még nincs'
+		[night.label, formatNightDate(night.date, 'long')].filter(Boolean).join(' · ') ||
+			'Időpont még nincs'
 	);
 </script>
 
@@ -90,9 +91,8 @@
 		margin: 0;
 		padding: 4px 0 0;
 		display: flex;
+		flex-wrap: wrap;
 		gap: 6px;
-		overflow-x: auto;
-		scrollbar-width: none;
 	}
 
 	.person {

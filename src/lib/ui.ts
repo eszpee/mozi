@@ -33,14 +33,14 @@ const dateFmt = new Intl.DateTimeFormat('hu-HU', {
 });
 export const formatDate = (ms: number) => dateFmt.format(ms);
 
-export function formatNightDate(iso: string | null) {
+/** "okt. 18., V", or with a `long` weekday "okt. 18., Vasárnap". */
+export function formatNightDate(iso: string | null, weekday: 'short' | 'long' = 'short') {
 	if (!iso) return null;
 	const d = new Date(`${iso}T12:00:00`);
-	return new Intl.DateTimeFormat('hu-HU', {
-		weekday: 'short',
-		day: 'numeric',
-		month: 'short'
-	}).format(d);
+	return new Intl.DateTimeFormat('hu-HU', { weekday, day: 'numeric', month: 'short' })
+		.formatToParts(d)
+		.map((p) => (p.type === 'weekday' ? p.value[0].toUpperCase() + p.value.slice(1) : p.value))
+		.join('');
 }
 
 const languageNames = new Intl.DisplayNames('hu-HU', { type: 'language' });
