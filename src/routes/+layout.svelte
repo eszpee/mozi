@@ -27,8 +27,10 @@
 		timeZone: 'Europe/Budapest'
 	}).format(new Date(__BUILD_DATE__));
 
-	const nav = [
+	// An icon stands in for a long label on narrow screens.
+	const nav: { href: string; label: string; icon?: string }[] = [
 		{ href: '/', label: 'Filmek' },
+		{ href: '/comments', label: 'Beszélgetések', icon: '💬' },
 		{ href: '/watched', label: 'Láttuk már' }
 	];
 </script>
@@ -49,8 +51,18 @@
 			<a href="/" class="logo" aria-label="mozi kezdőlap">mozi<span>.</span></a>
 			<nav>
 				{#each nav as item (item.href)}
-					<a href={item.href} aria-current={page.url.pathname === item.href ? 'page' : undefined}>
-						{item.label}
+					<a
+						href={item.href}
+						aria-current={page.url.pathname === item.href ? 'page' : undefined}
+						aria-label={item.icon ? item.label : undefined}
+						title={item.icon ? item.label : undefined}
+					>
+						{#if item.icon}
+							<span class="nav-icon" aria-hidden="true">{item.icon}</span>
+							<span class="nav-label" aria-hidden="true">{item.label}</span>
+						{:else}
+							{item.label}
+						{/if}
 					</a>
 				{/each}
 			</nav>
@@ -131,6 +143,7 @@
 		color: var(--text-muted);
 		font-weight: 550;
 		font-size: 14px;
+		white-space: nowrap;
 	}
 
 	nav a[aria-current='page'] {
@@ -138,13 +151,19 @@
 		background: var(--surface);
 	}
 
-	.add-label {
+	.add-label,
+	.nav-label {
 		display: none;
 	}
 
 	@media (min-width: 560px) {
-		.add-label {
+		.add-label,
+		.nav-label {
 			display: inline;
+		}
+
+		.nav-icon {
+			display: none;
 		}
 	}
 

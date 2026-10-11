@@ -1,7 +1,8 @@
-import { and, asc, eq, isNull } from 'drizzle-orm';
+import { and, asc, desc, eq, isNull } from 'drizzle-orm';
 import { db, schema } from '#lib/server/db/index.ts';
 import { toMember, type Member } from '#lib/server/users.ts';
 import type { VoteValue } from '#lib/scoring.ts';
+import { displayTitle, type DisplayTitle } from '#lib/titles.ts';
 
 export const COMMENT_MAX = 2000;
 
@@ -39,6 +40,38 @@ export function listComments(movieId: number, meId: number): CommentView[] {
 		edited: !!comment.editedAt,
 		mine: comment.userId === meId
 	}));
+}
+
+export type ConversationView = {
+	movieId: number;
+	title: DisplayTitle;
+	posterPath: string | null;
+	latest: { author: Member; body: string; createdAt: number };
+};
+
+/** Every movie with comments, each with its newest one, most recently discussed first. */
+export function listConversations(): ConversationView[] {
+	const rows = db
+		.select({ comment: schema.comments, user: schema.users, movie: schema.movies })
+		.from(schema.comments)
+		.innerJoin(schema.users, eq(schema.users.id, schema.comments.userId))
+		.innerJoin(schema.movies, eq(schema.movies.id, schema.comments.movieId))
+		.where(and(isNull(schema.comments.deletedAt), isNull(schema.movies.deletedAt)))
+		.orderBy(desc(schema.comments.createdAt), desc(schema.comments.id))
+		.all();
+	const seen = new Set<number>();
+	const views: ConversationView[] = [];
+	for (const { comment, user, movie } of rows) {
+		if (seen.has(movie.id)) continue;
+		seen.add(movie.id);
+		views.push({
+			movieId: movie.id,
+			title: displayTitle(movie.meta),
+			posterPath: movie.meta.posterPath,
+			latest: { author: toMember(user), body: comment.body, createdAt: comment.createdAt.getTime() }
+		});
+	}
+	return views;
 }
 
 export function addComment(movieId: number, userId: number, body: string) {

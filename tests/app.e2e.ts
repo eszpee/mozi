@@ -194,6 +194,29 @@ test.describe.serial('movie night', () => {
 		await expect(admin.locator('.comment').nth(1)).toContainText('Fair enough');
 	});
 
+	test('conversations list movies by their latest comment', async () => {
+		await go(bea, '/');
+		await card(bea, 'Kontroll').getByRole('link').first().click();
+		await bea.getByLabel('Hozzászólás írása').fill('Classic!');
+		await bea.getByRole('button', { name: 'Küldés' }).click();
+		await expect(bea.locator('.comment')).toHaveCount(1);
+
+		await go(admin, '/');
+		await admin.getByRole('link', { name: 'Beszélgetések' }).click();
+		await expect(admin).toHaveURL('/comments');
+		const items = admin.locator('.conversation');
+		await expect(items).toHaveCount(2);
+		await expect(items.nth(0)).toContainText('Kontroll');
+		await expect(items.nth(0)).toContainText('Bea');
+		await expect(items.nth(0)).toContainText('Classic!');
+		await expect(items.nth(1)).toContainText('Amélie');
+		await expect(items.nth(1)).toContainText('Peter');
+		await expect(items.nth(1)).toContainText('Fair enough');
+
+		await items.nth(1).click();
+		await expect(admin).toHaveURL(/\/movie\/\d+#comments$/);
+	});
+
 	test('only admins can remove movies', async () => {
 		await go(bea, '/');
 		await card(bea, 'Dune: Part Two').getByRole('link').first().click();
