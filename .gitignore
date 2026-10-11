@@ -38,3 +38,6 @@ playwright-report
 
 # Local deploy helpers
 .deploy
+
+# Tailnet preview database
+/preview-data

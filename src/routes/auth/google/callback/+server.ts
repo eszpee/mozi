@@ -1,4 +1,5 @@
 import { redirect } from '@sveltejs/kit';
+import { SECURE_COOKIES } from '#lib/server/auth/session.ts';
 import { STATE_COOKIE, VERIFIER_COOKIE, finishGoogleLogin } from '#lib/server/auth/google.ts';
 import { INVITE_COOKIE, isValidInvite } from '#lib/server/auth/invites.ts';
 import { createSession, setSessionCookie } from '#lib/server/auth/session.ts';
@@ -9,8 +10,8 @@ export async function GET({ url, cookies }) {
 	const state = url.searchParams.get('state');
 	const storedState = cookies.get(STATE_COOKIE);
 	const verifier = cookies.get(VERIFIER_COOKIE);
-	cookies.delete(STATE_COOKIE, { path: '/', secure: true });
-	cookies.delete(VERIFIER_COOKIE, { path: '/', secure: true });
+	cookies.delete(STATE_COOKIE, { path: '/', secure: SECURE_COOKIES });
+	cookies.delete(VERIFIER_COOKIE, { path: '/', secure: SECURE_COOKIES });
 
 	if (!code || !state || !storedState || !verifier || state !== storedState) {
 		redirect(303, '/login?error=expired');
@@ -30,7 +31,7 @@ export async function GET({ url, cookies }) {
 
 	const user =
 		existing && !existing.removedAt ? existing : upsertMember(identity.sub, identity.email);
-	cookies.delete(INVITE_COOKIE, { path: '/', secure: true });
+	cookies.delete(INVITE_COOKIE, { path: '/', secure: SECURE_COOKIES });
 
 	const session = createSession(user.id);
 	setSessionCookie(cookies, session.token, session.expiresAt);

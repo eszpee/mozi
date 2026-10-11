@@ -1,9 +1,13 @@
 import { and, eq, isNull } from 'drizzle-orm';
 import type { Cookies } from '@sveltejs/kit';
+import { dev } from '$app/env';
 import { db, schema } from '#lib/server/db/index.ts';
 import { generateToken, hashToken } from './tokens.ts';
 
-export const SESSION_COOKIE = '__Host-mozi_session';
+// Production always runs on https. The dev server may be opened over plain http
+// from another device (e.g. via the tailnet), where browsers drop Secure cookies.
+export const SECURE_COOKIES = !dev;
+export const SESSION_COOKIE = SECURE_COOKIES ? '__Host-mozi_session' : 'mozi_session';
 
 const DAY = 24 * 60 * 60 * 1000;
 // Browsers cap cookie lifetime at 400 days; sliding renewal makes the login effectively permanent.
@@ -24,14 +28,14 @@ export function setSessionCookie(cookies: Cookies, token: string, expiresAt: Dat
 	cookies.set(SESSION_COOKIE, token, {
 		path: '/',
 		httpOnly: true,
-		secure: true,
+		secure: SECURE_COOKIES,
 		sameSite: 'lax',
 		expires: expiresAt
 	});
 }
 
 export function clearSessionCookie(cookies: Cookies) {
-	cookies.delete(SESSION_COOKIE, { path: '/', secure: true });
+	cookies.delete(SESSION_COOKIE, { path: '/', secure: SECURE_COOKIES });
 }
 
 /**

@@ -3,6 +3,10 @@ import adapter from '@sveltejs/adapter-node';
 import { sveltekit } from '@sveltejs/kit/vite';
 
 export default defineConfig({
+	server: {
+		// Lets the dev server be opened from other devices on the tailnet.
+		allowedHosts: ['.ts.net']
+	},
 	plugins: [
 		sveltekit({
 			compilerOptions: {
