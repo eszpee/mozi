@@ -1,0 +1,570 @@
+<script lang="ts">
+	import { enhance } from '$app/forms';
+	import Poster from '#lib/components/Poster.svelte';
+	import AvailabilityBadge from '#lib/components/AvailabilityBadge.svelte';
+	import VoteButtons from '#lib/components/VoteButtons.svelte';
+	import Avatar from '#lib/components/Avatar.svelte';
+	import Linkified from '#lib/components/Linkified.svelte';
+	import { formatDate, formatRuntime, posterUrl, timeAgo, trailerUrl, voteEmoji } from '#lib/ui.ts';
+
+	let { data, form } = $props();
+	let movie = $derived(data.movie);
+
+	let confirmWatched = $state(false);
+	let confirmRemove = $state(false);
+	let editingId: number | null = $state(null);
+	let commentBody = $state('');
+	let posting = $state(false);
+
+	let details = $derived(
+		[movie.year, formatRuntime(movie.runtime), movie.genres.slice(0, 3).join(', ')]
+			.filter(Boolean)
+			.join(' · ')
+	);
+	let groups = $derived([
+		{ emoji: '👍', people: movie.votes.filter((v) => v.value === 1) },
+		{ emoji: '🤷', people: movie.votes.filter((v) => v.value === 0) },
+		{ emoji: '👎', people: movie.votes.filter((v) => v.value === -1) }
+	]);
+	let watched = $derived(movie.watchedAt !== null);
+</script>
+
+<svelte:head><title>{movie.title.main} · mozi</title></svelte:head>
+
+<div class="hero">
+	{#if movie.posterPath}
+		<div class="backdrop" style:background-image="url({posterUrl(movie.posterPath, 185)})"></div>
+	{/if}
+	<div class="wrap hero-inner">
+		<div class="poster">
+			<Poster
+				path={movie.posterPath}
+				title={movie.title.main}
+				eager
+				sizes="(min-width: 640px) 220px, 130px"
+			/>
+		</div>
+		<div class="headline">
+			<AvailabilityBadge status={movie.availability} variant="inline" />
+			<h1>{movie.title.main}</h1>
+			{#if movie.title.original}<p class="original">{movie.title.original}</p>{/if}
+			<p class="details">{details}</p>
+			{#if movie.rating}<p class="rating">★ {movie.rating.toFixed(1)} <span>TMDB</span></p>{/if}
+			<div class="links">
+				{#if movie.imdbId}
+					<a
+						class="btn btn-small"
+						href="https://www.imdb.com/title/{movie.imdbId}/"
+						target="_blank"
+						rel="noopener noreferrer">IMDb ↗</a
+					>
+				{/if}
+				<a
+					class="btn btn-small"
+					href={trailerUrl(movie.trailerKey, movie.title.main, movie.year)}
+					target="_blank"
+					rel="noopener noreferrer">▶ Trailer</a
+				>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="wrap body">
+	{#if watched}
+		<p class="watched-note card">
+			✓ Watched together on {formatDate(movie.watchedAt!)}. Votes are closed.
+			<a href="/watched">See all watched</a>
+		</p>
+	{/if}
+
+	<section class="vote-section">
+		<VoteButtons
+			movieId={movie.id}
+			myVote={movie.myVote}
+			tally={movie.tally}
+			size="large"
+			disabled={watched}
+		/>
+		<div class="voters">
+			{#each groups as g (g.emoji)}
+				{#if g.people.length}
+					<div class="group">
+						<span class="emoji">{g.emoji}</span>
+						{#each g.people as v (v.member.id)}
+							<span class="person"
+								><Avatar seed={v.member.avatarSeed} name={v.member.nickname} size={22} />{v.member
+									.nickname}</span
+							>
+						{/each}
+					</div>
+				{/if}
+			{/each}
+		</div>
+	</section>
+
+	<section class="actions">
+		<form
+			method="POST"
+			action="?/seen"
+			use:enhance={() =>
+				async ({ update }) =>
+					update({ reset: false })}
+		>
+			<input type="hidden" name="movieId" value={movie.id} />
+			<button
+				class="btn btn-small"
+				class:on={movie.mySeen}
+				type="submit"
+				aria-pressed={movie.mySeen}
+			>
+				{movie.mySeen ? '✓ I’ve seen it' : 'I’ve seen it'}
+			</button>
+		</form>
+
+		{#if !watched}
+			{#if confirmWatched}
+				<form method="POST" action="?/watched" class="confirm">
+					<span class="muted">
+						{data.attendees.length
+							? `Marks it seen for ${data.attendees.map((a) => a.nickname).join(', ')} and starts a new night.`
+							: 'Archives it and starts a new night.'}
+					</span>
+					<button class="btn btn-small btn-primary" type="submit">Yes, we watched it</button>
+					<button
+						class="btn btn-small btn-ghost"
+						type="button"
+						onclick={() => (confirmWatched = false)}>Cancel</button
+					>
+				</form>
+			{:else}
+				<button class="btn btn-small" type="button" onclick={() => (confirmWatched = true)}
+					>🎬 We watched it</button
+				>
+			{/if}
+		{/if}
+
+		{#if data.canRequest}
+			<form method="POST" action="?/request" use:enhance>
+				<button class="btn btn-small" type="submit">＋ Request in Radarr</button>
+			</form>
+		{/if}
+		{#if form?.requestError}<p class="error-text">{form.requestError}</p>{/if}
+
+		{#if data.admin}
+			{#if confirmRemove}
+				<form method="POST" action="?/remove" class="confirm">
+					<button class="btn btn-small danger" type="submit">Remove for everyone</button>
+					<button
+						class="btn btn-small btn-ghost"
+						type="button"
+						onclick={() => (confirmRemove = false)}>Cancel</button
+					>
+				</form>
+			{:else}
+				<button
+					class="btn btn-small btn-ghost danger-text"
+					type="button"
+					onclick={() => (confirmRemove = true)}>Remove</button
+				>
+			{/if}
+		{/if}
+	</section>
+
+	{#if movie.seenBy.length}
+		<p class="seen-by">
+			<span class="faint">Seen by</span>
+			{#each movie.seenBy as m (m.id)}
+				<span class="person"
+					><Avatar seed={m.avatarSeed} name={m.nickname} size={22} />{m.nickname}</span
+				>
+			{/each}
+		</p>
+	{/if}
+
+	{#if movie.overview}<p class="overview">{movie.overview}</p>{/if}
+	<p class="faint added">Recommended by {movie.addedBy.nickname} · {timeAgo(movie.addedAt)}</p>
+
+	<section id="comments" class="comments">
+		<h2>
+			Comments {#if data.comments.length}<span class="faint">{data.comments.length}</span>{/if}
+		</h2>
+		{#if data.comments.length}
+			<ol class="thread">
+				{#each data.comments as c (c.id)}
+					<li class="comment">
+						<Avatar seed={c.author.avatarSeed} name={c.author.nickname} size={34} />
+						<div class="bubble">
+							<p class="meta">
+								<strong>{c.author.nickname}</strong>
+								{#if c.authorVote !== null}<span title="Their vote">{voteEmoji(c.authorVote)}</span
+									>{/if}
+								<span class="faint">{timeAgo(c.createdAt)}{c.edited ? ' · edited' : ''}</span>
+							</p>
+							{#if editingId === c.id}
+								<form
+									method="POST"
+									action="?/editComment"
+									class="edit"
+									use:enhance={() =>
+										async ({ update, result }) => {
+											await update({ reset: false });
+											if (result.type === 'success') editingId = null;
+										}}
+								>
+									<input type="hidden" name="commentId" value={c.id} />
+									<textarea class="input" name="body" maxlength="2000" required>{c.body}</textarea>
+									<div class="row">
+										<button class="btn btn-small btn-primary" type="submit">Save</button>
+										<button
+											class="btn btn-small btn-ghost"
+											type="button"
+											onclick={() => (editingId = null)}>Cancel</button
+										>
+									</div>
+								</form>
+							{:else}
+								<p class="text"><Linkified text={c.body} /></p>
+								{#if c.mine || data.admin}
+									<div class="tools">
+										{#if c.mine}<button type="button" onclick={() => (editingId = c.id)}
+												>Edit</button
+											>{/if}
+										<form
+											method="POST"
+											action="?/deleteComment"
+											use:enhance={() =>
+												async ({ update }) =>
+													update({ reset: false })}
+										>
+											<input type="hidden" name="commentId" value={c.id} />
+											<button type="submit">Delete</button>
+										</form>
+									</div>
+								{/if}
+							{/if}
+						</div>
+					</li>
+				{/each}
+			</ol>
+		{:else}
+			<p class="faint">No comments yet. Why should (or shouldn’t) we watch it?</p>
+		{/if}
+
+		<form
+			method="POST"
+			action="?/comment"
+			class="new-comment"
+			use:enhance={() => {
+				posting = true;
+				return async ({ update, result }) => {
+					await update({ reset: false });
+					if (result.type === 'success') commentBody = '';
+					posting = false;
+				};
+			}}
+		>
+			<label for="comment" class="sr-only">Add a comment</label>
+			<textarea
+				id="comment"
+				class="input"
+				name="body"
+				maxlength="2000"
+				rows="2"
+				placeholder="Add a comment…"
+				required
+				bind:value={commentBody}></textarea>
+			{#if form?.commentError}<p class="error-text">{form.commentError}</p>{/if}
+			<button
+				class="btn btn-primary btn-small"
+				type="submit"
+				disabled={posting || !commentBody.trim()}>Post</button
+			>
+		</form>
+	</section>
+</div>
+
+<style>
+	.hero {
+		position: relative;
+		overflow: hidden;
+		border-bottom: 1px solid var(--line);
+	}
+
+	.backdrop {
+		position: absolute;
+		inset: -40px;
+		background-size: cover;
+		background-position: center;
+		filter: blur(40px) saturate(1.3);
+		opacity: 0.35;
+	}
+
+	.hero::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(to bottom, transparent 30%, var(--bg));
+	}
+
+	.hero-inner {
+		position: relative;
+		z-index: 1;
+		display: grid;
+		grid-template-columns: 120px 1fr;
+		gap: 16px;
+		padding-top: 20px;
+		padding-bottom: 20px;
+		align-items: end;
+	}
+
+	@media (min-width: 640px) {
+		.hero-inner {
+			grid-template-columns: 220px 1fr;
+			gap: 28px;
+			padding-top: 36px;
+			padding-bottom: 28px;
+		}
+	}
+
+	.poster {
+		box-shadow: var(--shadow);
+		border-radius: var(--radius);
+	}
+
+	.headline {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		align-items: flex-start;
+		min-width: 0;
+	}
+
+	h1 {
+		font-size: clamp(24px, 6vw, 44px);
+		overflow-wrap: anywhere;
+	}
+
+	.original {
+		margin: 0;
+		font-style: italic;
+		color: var(--text-muted);
+	}
+
+	.details,
+	.rating {
+		margin: 0;
+		font-size: 14px;
+		color: var(--text-muted);
+	}
+
+	.rating {
+		color: var(--accent);
+		font-weight: 650;
+	}
+
+	.rating span {
+		color: var(--text-faint);
+		font-weight: 500;
+		font-size: 12px;
+	}
+
+	.links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		margin-top: 6px;
+	}
+
+	.body {
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+		padding-top: 20px;
+		max-width: 760px;
+	}
+
+	.watched-note {
+		margin: 0;
+		padding: 12px 16px;
+		color: var(--up);
+	}
+
+	.watched-note a {
+		color: var(--text-muted);
+		margin-left: 6px;
+	}
+
+	.vote-section {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.voters {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.group,
+	.seen-by {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 6px 10px;
+		margin: 0;
+	}
+
+	.group .emoji {
+		font-size: 18px;
+		width: 24px;
+	}
+
+	.person {
+		display: inline-flex;
+		align-items: center;
+		gap: 5px;
+		font-size: 13.5px;
+		color: var(--text-muted);
+	}
+
+	.actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		align-items: center;
+	}
+
+	.btn.on {
+		border-color: var(--up);
+		color: var(--up);
+	}
+
+	.confirm {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		align-items: center;
+		padding: 10px 12px;
+		border-radius: var(--radius);
+		background: var(--bg-raised);
+		border: 1px solid var(--line);
+		font-size: 13px;
+	}
+
+	.danger {
+		background: var(--down);
+		border-color: var(--down);
+		color: #2a0610;
+	}
+
+	.danger-text {
+		color: var(--down);
+	}
+
+	.overview {
+		margin: 0;
+		color: var(--text-muted);
+		line-height: 1.6;
+	}
+
+	.added {
+		margin: -10px 0 0;
+		font-size: 13px;
+	}
+
+	.comments {
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+		padding-top: 8px;
+		border-top: 1px solid var(--line);
+	}
+
+	.comments h2 {
+		font-size: 20px;
+		padding-top: 16px;
+	}
+
+	.thread {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+	}
+
+	.comment {
+		display: grid;
+		grid-template-columns: 34px 1fr;
+		gap: 10px;
+	}
+
+	.bubble {
+		min-width: 0;
+		padding: 10px 14px;
+		border-radius: 4px var(--radius) var(--radius) var(--radius);
+		background: var(--bg-raised);
+		border: 1px solid var(--line);
+	}
+
+	.meta {
+		margin: 0 0 2px;
+		display: flex;
+		gap: 6px;
+		align-items: baseline;
+		font-size: 13px;
+	}
+
+	.text {
+		margin: 0;
+	}
+
+	.tools {
+		display: flex;
+		gap: 12px;
+		margin-top: 6px;
+	}
+
+	.tools button {
+		background: none;
+		border: 0;
+		padding: 0;
+		font-size: 12px;
+		color: var(--text-faint);
+		cursor: pointer;
+	}
+
+	.tools button:hover {
+		color: var(--text);
+	}
+
+	.edit {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		margin-top: 6px;
+	}
+
+	.row {
+		display: flex;
+		gap: 8px;
+	}
+
+	.new-comment {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		align-items: flex-end;
+	}
+
+	.new-comment textarea {
+		min-height: 64px;
+	}
+
+	.faint {
+		color: var(--text-faint);
+	}
+</style>
