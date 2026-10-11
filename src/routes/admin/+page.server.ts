@@ -42,7 +42,9 @@ export function load({ locals, url }) {
 			lastAction: last.get(u.id) ?? null,
 			removed: !!u.removedAt,
 			me: u.id === locals.user!.id
-		}));
+		}))
+		// Deactivated members at the bottom; otherwise by join date.
+		.sort((a, b) => Number(a.removed) - Number(b.removed));
 	return {
 		inviteUrl: `${url.origin}/join/${invite.token}`,
 		members,
