@@ -3,7 +3,7 @@ import { SECURE_COOKIES } from '#lib/server/auth/session.ts';
 import { STATE_COOKIE, VERIFIER_COOKIE, finishGoogleLogin } from '#lib/server/auth/google.ts';
 import { INVITE_COOKIE, isValidInvite } from '#lib/server/auth/invites.ts';
 import { createSession, setSessionCookie } from '#lib/server/auth/session.ts';
-import { findUserByGoogleSub, upsertMember } from '#lib/server/users.ts';
+import { findUserByGoogleSub, isAdmin, upsertMember } from '#lib/server/users.ts';
 
 export async function GET({ url, cookies }) {
 	const code = url.searchParams.get('code');
@@ -26,7 +26,8 @@ export async function GET({ url, cookies }) {
 	}
 
 	const existing = findUserByGoogleSub(identity.sub);
-	const invited = isValidInvite(cookies.get(INVITE_COOKIE));
+	// Admins (ADMIN_EMAILS) may join without an invite: someone has to be first.
+	const invited = isAdmin(identity) || isValidInvite(cookies.get(INVITE_COOKIE));
 	if (!invited && (!existing || existing.removedAt)) redirect(303, '/login?error=not-invited');
 
 	const user =
