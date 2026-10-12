@@ -4,14 +4,11 @@
 	type Status = 'plex' | 'downloading' | 'requested' | 'waiting';
 	let {
 		status,
-		expected = null,
 		offers = [],
 		logos = true,
 		variant = 'overlay'
 	}: {
 		status: Status | null;
-		/** First home release (YYYY-MM-DD) of a movie we're waiting for. */
-		expected?: string | null;
 		/** Where it streams or rents; any of them makes the movie available, like our own Plex. */
 		offers?: { name: string; logo: string }[];
 		/** Lists the services after the label, Plex first. */
@@ -34,28 +31,13 @@
 		...(status === 'plex' ? [{ name: 'Plex', src: '/providers/plex.svg' }] : []),
 		...offers.map((p) => ({ name: p.name, src: providerLogoUrl(p.logo) }))
 	]);
-	// Release dates are midnight UTC, so they're read in UTC to keep the day.
-	let expectedText = $derived(
-		shown === 'waiting' && expected
-			? new Intl.DateTimeFormat('hu-HU', { dateStyle: 'medium', timeZone: 'UTC' }).format(
-					new Date(expected)
-				)
-			: null
-	);
-	// The movie page has room for the date; cards show it on hover.
-	let label = $derived(
-		shown && expectedText && variant === 'inline'
-			? `${LABELS[shown].text} · ${expectedText}`
-			: shown && LABELS[shown].text
-	);
+	let label = $derived(shown && LABELS[shown].text);
 	let title = $derived(
 		shown === 'available' && services.length
 			? `${LABELS.available.text}: ${services.map((s) => s.name).join(', ')}`
-			: expectedText
-				? `Még nem jelent meg, várhatóan ${expectedText}`
-				: shown === 'waiting'
-					? 'Még nem jelent meg'
-					: shown && LABELS[shown].text
+			: shown === 'waiting'
+				? 'Még nem jelent meg'
+				: shown && LABELS[shown].text
 	);
 </script>
 

@@ -47,8 +47,6 @@ export type MovieView = {
 	mySeen: boolean;
 	commentCount: number;
 	availability: AvailabilityStatus | null;
-	/** First home release (YYYY-MM-DD) while the availability is 'waiting'. */
-	expectedRelease: string | null;
 };
 
 /** Credits cached before links were added are bare names; they show unlinked until the refresh. */
@@ -126,8 +124,7 @@ function buildViews(rows: Movie[], meId: number, voters?: ReadonlySet<number>): 
 				.length,
 			mySeen: ms.some((s) => s.userId === meId),
 			commentCount: commentCounts.get(m.id) ?? 0,
-			availability: avail.get(m.tmdbId)?.status ?? null,
-			expectedRelease: avail.get(m.tmdbId)?.expected ?? null
+			availability: avail.get(m.tmdbId)?.status ?? null
 		};
 	});
 }

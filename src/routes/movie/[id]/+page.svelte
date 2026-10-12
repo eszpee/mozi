@@ -99,7 +99,6 @@
 		<div class="headline">
 			<AvailabilityBadge
 				status={movie.availability}
-				expected={movie.expectedRelease}
 				offers={[...movie.providers.stream, ...movie.providers.rent]}
 				logos={false}
 				variant="inline"
