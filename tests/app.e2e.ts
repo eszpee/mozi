@@ -460,3 +460,15 @@ test('theme is automatic, light or dark, and a picked one sticks', async ({ brow
 	await expect(page.locator('html')).not.toHaveAttribute('data-theme');
 	expect(await background()).toBe(DARK);
 });
+
+test('the account menu closes on a click outside it', async ({ browser }) => {
+	const page = await signIn(browser, 'menu', 'Mária');
+	const menu = page.locator('details.me');
+	await page.getByLabel('Fiókmenü').click();
+	await expect(menu).toHaveAttribute('open');
+	// A click inside (on the theme picker) keeps it open.
+	await page.getByRole('radio', { name: 'Sötét' }).check();
+	await expect(menu).toHaveAttribute('open');
+	await page.locator('main').click({ position: { x: 5, y: 5 } });
+	await expect(menu).not.toHaveAttribute('open');
+});

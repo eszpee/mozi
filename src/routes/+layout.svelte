@@ -20,6 +20,11 @@
 		if (menu) menu.open = false;
 	});
 
+	// …and once a click lands outside it.
+	function closeMenuOutside(event: MouseEvent) {
+		if (menu?.open && !menu.contains(event.target as Node)) menu.open = false;
+	}
+
 	// Fixed time zone, so server and browser render the same text.
 	const buildDate = new Intl.DateTimeFormat('hu-HU', {
 		dateStyle: 'short',
@@ -78,6 +83,8 @@
 	<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 	<title>mozi</title>
 </svelte:head>
+
+<svelte:window onclick={closeMenuOutside} />
 
 {#if data.me}
 	<header class="top">
