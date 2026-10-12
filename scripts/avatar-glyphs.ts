@@ -1,11 +1,11 @@
 // Copies the avatar emoji from Google Noto into src/lib/server/avatar-glyphs.json, so the
-// server doesn't load the whole 24 MB set. Rerun after changing EMOJI in avatar.ts:
+// server doesn't load the whole 24 MB set. Rerun after changing EMOJI in src/lib/avatar.ts:
 //   node scripts/avatar-glyphs.ts && npx prettier --write src/lib/server/avatar-glyphs.json
 import { writeFileSync } from 'node:fs';
 import { getIconData, iconToSVG } from '@iconify/utils';
 import icons from '@iconify-json/noto/icons.json' with { type: 'json' };
 import chars from '@iconify-json/noto/chars.json' with { type: 'json' };
-import { EMOJI } from '../src/lib/server/avatar.ts';
+import { EMOJI } from '../src/lib/avatar.ts';
 
 const codepoints = (e: string) =>
 	[...e]

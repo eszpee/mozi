@@ -61,15 +61,18 @@ test.describe.serial('movie night', () => {
 		await nickname.fill('Rolly');
 		const avatar = page.locator('.avatar-row img');
 		const before = await avatar.getAttribute('src');
-		await page.getByRole('button', { name: /Új képet kérek/ }).click();
+		await page.getByRole('button', { name: 'Új kép' }).click();
 		await expect(avatar).not.toHaveAttribute('src', before!);
 		await expect(nickname).toHaveValue('Rolly');
+		const newPicture = await avatar.getAttribute('src');
+		await page.getByRole('button', { name: 'Új szín' }).click();
+		await expect(avatar).not.toHaveAttribute('src', newPicture!);
 		const picked = await avatar.getAttribute('src');
 		// Leaving without saving keeps the old avatar.
 		await go(page, '/welcome');
 		await expect(avatar).toHaveAttribute('src', before!);
 		// Saving stores the new one.
-		await page.getByRole('button', { name: /Új képet kérek/ }).click();
+		await page.getByRole('button', { name: 'Új kép' }).click();
 		const saved = await avatar.getAttribute('src');
 		expect(saved).not.toBe(picked);
 		await page.getByLabel('Hogy hívnak?').fill('Rolly');

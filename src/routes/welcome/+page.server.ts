@@ -3,7 +3,7 @@ import { and, eq, isNull, ne, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db, schema } from '#lib/server/db/index.ts';
 import { NICKNAME_MAX } from '#lib/server/users.ts';
-import { AVATAR_SEED } from '#lib/server/avatar.ts';
+import { AVATAR_SEED } from '#lib/avatar.ts';
 
 export function load({ locals }) {
 	const user = locals.user!;

@@ -1,5 +1,6 @@
 import { error } from '@sveltejs/kit';
-import { AVATAR_SEED, avatarSvg } from '#lib/server/avatar.ts';
+import { AVATAR_SEED } from '#lib/avatar.ts';
+import { avatarSvg } from '#lib/server/avatar.ts';
 
 export function GET({ params }) {
 	if (!AVATAR_SEED.test(params.seed)) error(404, 'Nincs ilyen oldal');
