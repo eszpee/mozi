@@ -22,7 +22,7 @@
 	const LABELS = {
 		available: { icon: '▶', text: 'Elérhető' },
 		downloading: { icon: '↓', text: 'Töltődik' },
-		requested: { icon: '⏳', text: 'Keressük' },
+		requested: { icon: '🔍', text: 'Keressük' },
 		waiting: { icon: '⏳', text: 'Várjuk' }
 	} as const;
 	const MAX_LOGOS = 3;
