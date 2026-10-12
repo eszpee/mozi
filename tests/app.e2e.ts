@@ -258,6 +258,12 @@ test.describe.serial('movie night', () => {
 		await expect(badge(admin)).toHaveText('1');
 		await go(admin, '/');
 		await expect(badge(admin)).toHaveText('1');
+
+		// Phones show only the 💬 icon: the badge sits on it, inside the screen.
+		await admin.setViewportSize({ width: 375, height: 812 });
+		await expect(badge(admin)).toBeInViewport({ ratio: 1 });
+		await expect(admin.locator('nav .nav-icon.glow')).toBeVisible();
+		await admin.setViewportSize({ width: 1280, height: 720 });
 	});
 
 	test('only admins can remove movies', async () => {

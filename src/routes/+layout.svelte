@@ -67,7 +67,11 @@
 						title={item.icon ? item.label : undefined}
 					>
 						{#if item.icon}
-							<span class="nav-icon" aria-hidden="true">{item.icon}</span>
+							<span
+								class="nav-icon"
+								class:glow={item.href === '/comments' && unread}
+								aria-hidden="true">{item.icon}</span
+							>
 							<span class="nav-label" aria-hidden="true">{item.label}</span>
 						{:else}
 							{item.label}
@@ -149,6 +153,7 @@
 	}
 
 	nav a {
+		position: relative;
 		padding: 6px 10px;
 		border-radius: 999px;
 		text-decoration: none;
@@ -180,6 +185,39 @@
 	.add-label,
 	.nav-label {
 		display: none;
+	}
+
+	/* Small phones: tighter spacing, so the nav doesn't run under the add button. */
+	@media (max-width: 400px) {
+		.bar {
+			gap: 8px;
+		}
+
+		nav {
+			margin-left: 0;
+		}
+
+		nav a {
+			padding: 6px 7px;
+		}
+	}
+
+	/* On phones the badge sits on the icon's corner, and the icon glows. */
+	@media (max-width: 559px) {
+		.badge {
+			position: absolute;
+			top: -2px;
+			right: -2px;
+			min-width: 16px;
+			margin: 0;
+			padding: 0 4px;
+			font-size: 10px;
+			line-height: 16px;
+		}
+
+		.glow {
+			filter: drop-shadow(0 0 3px var(--accent)) drop-shadow(0 0 7px rgb(245 181 68 / 0.7));
+		}
 	}
 
 	@media (min-width: 560px) {
