@@ -289,6 +289,11 @@ test.describe.serial('movie night', () => {
 		const cells = await amelie.locator('td').allTextContents();
 		expect(cells[header.indexOf('Peter')].trim()).toBe('👍');
 		expect(cells[header.indexOf('Bea')].trim()).toBe('👎');
+		// Totals per row (👍 🤷 👎), zero left empty.
+		expect(cells.slice(-3).map((c) => c.trim())).toEqual(['1', '', '1']);
+		// Totals per column: Bea's 👎 row counts her one 👎 (Amélie).
+		const beaDown = admin.locator('tfoot tr').nth(2).locator('td').nth(header.indexOf('Bea'));
+		await expect(beaDown).toHaveText('1');
 		await expect(amelie.getByRole('img', { name: 'Ajánlotta: Peter' })).toBeVisible();
 
 		await go(bea, '/');

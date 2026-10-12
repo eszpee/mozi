@@ -1,8 +1,30 @@
 <script lang="ts">
 	import Avatar from '#lib/components/Avatar.svelte';
-	import { posterUrl, voteEmoji } from '#lib/ui.ts';
+	import { VOTE_OPTIONS, posterUrl, voteEmoji } from '#lib/ui.ts';
+	import type { VoteValue } from '#lib/scoring.ts';
 
 	let { data } = $props();
+
+	const count = (values: (VoteValue | undefined)[], v: VoteValue) =>
+		values.filter((x) => x === v).length;
+	// Zero shows as an empty cell.
+	const blank = (n: number) => n || '';
+
+	let rowTotals = $derived(
+		new Map(
+			data.rows.map((r) => [r.id, VOTE_OPTIONS.map((o) => count(Object.values(r.votes), o.value))])
+		)
+	);
+	let columnTotals = $derived(
+		VOTE_OPTIONS.map((o) =>
+			data.members.map((m) =>
+				count(
+					data.rows.map((r) => r.votes[m.id]),
+					o.value
+				)
+			)
+		)
+	);
 </script>
 
 <svelte:head><title>Szavazatok · mozi</title></svelte:head>
@@ -22,6 +44,10 @@
 									<span class="name">{m.nickname}</span>
 								</div>
 							</th>
+						{/each}
+						{#each VOTE_OPTIONS as o, i (o.value)}
+							<th class="total-head" class:first={i === 0} scope="col" title={o.label}>{o.emoji}</th
+							>
 						{/each}
 					</tr>
 				</thead>
@@ -47,9 +73,28 @@
 							{#each data.members as m (m.id)}
 								<td>{voteEmoji(r.votes[m.id] ?? null)}</td>
 							{/each}
+							{#each rowTotals.get(r.id)! as n, i (i)}
+								<td class="total" class:first={i === 0}>{blank(n)}</td>
+							{/each}
 						</tr>
 					{/each}
 				</tbody>
+				<tfoot>
+					{#each VOTE_OPTIONS as o, i (o.value)}
+						<tr class:first={i === 0}>
+							<th class="movie total-label" scope="row" title={o.label}>{o.emoji}</th>
+							{#each columnTotals[i] as n, j (j)}
+								<td class="total">{blank(n)}</td>
+							{/each}
+							<!-- Where the same vote's row and column meet: its grand total. -->
+							{#each VOTE_OPTIONS as col, j (col.value)}
+								<td class="total" class:first={j === 0}>
+									{i === j ? blank(columnTotals[i].reduce((a, b) => a + b, 0)) : ''}
+								</td>
+							{/each}
+						</tr>
+					{/each}
+				</tfoot>
 			</table>
 		</div>
 	{:else}
@@ -69,12 +114,11 @@
 		font-size: 26px;
 	}
 
-	/* The table scrolls inside its box, so the page itself never pans sideways. */
+	/* Phones: the table scrolls sideways inside its box, so the page never pans. */
 	.matrix {
 		width: fit-content;
 		max-width: 100%;
-		overflow: auto;
-		max-height: calc(100dvh - 160px);
+		overflow-x: auto;
 		border: 1px solid var(--line);
 		border-radius: var(--radius);
 		background: var(--bg-raised);
@@ -92,16 +136,8 @@
 	}
 
 	thead th {
-		position: sticky;
-		top: 0;
-		z-index: 2;
 		background: var(--bg-raised);
 		vertical-align: bottom;
-	}
-
-	.corner {
-		left: 0;
-		z-index: 3;
 	}
 
 	.person {
@@ -139,7 +175,7 @@
 		align-items: center;
 		gap: 8px;
 		padding: 4px 10px 4px 8px;
-		max-width: 260px;
+		max-width: 220px;
 		text-decoration: none;
 		color: var(--text);
 	}
@@ -170,8 +206,57 @@
 		font-size: 16px;
 	}
 
+	.total-head {
+		padding: 8px 4px;
+		font-size: 16px;
+	}
+
+	.total {
+		font-size: 13px;
+		font-weight: 650;
+		color: var(--text-muted);
+		background: var(--bg-sunken);
+	}
+
+	/* A heavier line sets the totals apart from the votes. */
+	.first {
+		border-left: 2px solid var(--line-strong);
+	}
+
+	tfoot tr.first > * {
+		border-top: 2px solid var(--line-strong);
+	}
+
+	.total-label {
+		text-align: right;
+		padding: 4px 12px;
+		font-size: 16px;
+	}
+
 	tbody tr:hover th,
 	tbody tr:hover td {
 		background: var(--surface);
+	}
+
+	/* Wider screens: full titles, and the whole table on the page with the names
+	   pinned under the site header while scrolling. */
+	@media (min-width: 640px) {
+		.matrix {
+			overflow: visible;
+		}
+
+		.movie a {
+			max-width: none;
+		}
+
+		.title {
+			overflow: visible;
+		}
+
+		thead th {
+			position: sticky;
+			top: calc(60px + env(safe-area-inset-top));
+			z-index: 2;
+		}
 	}
 </style>
