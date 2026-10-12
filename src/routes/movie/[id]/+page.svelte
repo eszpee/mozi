@@ -8,6 +8,7 @@
 	import Linkified from '#lib/components/Linkified.svelte';
 	import {
 		formatDate,
+		formatIsoDate,
 		formatRelease,
 		formatRuntime,
 		languageName,
@@ -70,8 +71,15 @@
 		...movie.providers.stream.map(logo)
 	]);
 	let rentals = $derived(movie.providers.rent.map(logo));
-	// The digital release only matters until we can watch it: in Plex, or streaming/renting in Hungary.
-	let showDigital = $derived(streams.length === 0 && rentals.length === 0);
+	// The expected home release, until it's out or we can already watch it (Plex, or streaming/renting in Hungary).
+	let expected = $derived(
+		streams.length === 0 &&
+			rentals.length === 0 &&
+			movie.releases.home &&
+			movie.releases.home > new Date().toISOString().slice(0, 10)
+			? movie.releases.home
+			: null
+	);
 </script>
 
 <svelte:head><title>{movie.title.main} · mozi</title></svelte:head>
@@ -128,8 +136,8 @@
 			{#if movie.releases.theatrical}
 				<p class="details">Bemutató: {formatRelease(movie.releases.theatrical)}</p>
 			{/if}
-			{#if showDigital && movie.releases.digital}
-				<p class="details">Digitális: {formatRelease(movie.releases.digital)}</p>
+			{#if expected}
+				<p class="details">Várható: {formatIsoDate(expected)}</p>
 			{/if}
 			{#each [{ label: 'Elérhető', list: streams }, { label: 'Bérelhető', list: rentals }] as row (row.label)}
 				{#if row.list.length}

@@ -38,19 +38,20 @@ describe('pickReleases', () => {
 		expect(r.theatrical).toEqual({ date: '2026-09-01', countries: ['FR'], hu: null });
 	});
 
-	it('picks the digital release separately', () => {
+	it('picks the first digital or physical release anywhere as the home release', () => {
 		const r = pickReleases([
 			country('US', [3, '2026-10-03'], [4, '2026-11-18'], [5, '2026-12-20']),
+			country('DE', [5, '2026-11-12']),
 			country('HU', [3, '2026-10-16'])
 		]);
-		expect(r.digital).toEqual({ date: '2026-11-18', countries: ['US'], hu: null });
+		expect(r.home).toBe('2026-11-12');
 	});
 
 	it('is null where TMDB has no date', () => {
 		expect(pickReleases([country('US', [1, '2026-05-20'])])).toEqual({
 			theatrical: null,
-			digital: null
+			home: null
 		});
-		expect(pickReleases(undefined)).toEqual({ theatrical: null, digital: null });
+		expect(pickReleases(undefined)).toEqual({ theatrical: null, home: null });
 	});
 });

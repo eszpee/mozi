@@ -67,7 +67,7 @@ export type MovieMeta = {
 	watch?: Providers;
 	/** Minimum age (Hungarian rating, else German). Missing on movies cached before. */
 	ageRating?: AgeRating | null;
-	/** First theatrical and digital releases. Missing on movies cached before. */
+	/** First theatrical and home releases. Missing (or without `home`) on movies cached before. */
 	releases?: Releases;
 };
 

@@ -1,6 +1,7 @@
 /** The earliest release of a kind: its ISO date, the countries that had it then, and Hungary's when later. */
 export type Release = { date: string; countries: string[]; hu: string | null };
-export type Releases = { theatrical: Release | null; digital: Release | null };
+/** `home` is the first digital or physical (Blu-ray/DVD) release anywhere, as an ISO date. */
+export type Releases = { theatrical: Release | null; home: string | null };
 
 export type TmdbReleaseCountry = {
 	iso_3166_1: string;
@@ -9,7 +10,7 @@ export type TmdbReleaseCountry = {
 
 // TMDB release types: 1 premiere, 2 limited theatrical, 3 theatrical, 4 digital, 5 physical, 6 TV.
 const THEATRICAL = [2, 3];
-const DIGITAL = [4];
+const HOME = [4, 5];
 
 function pick(all: TmdbReleaseCountry[], types: number[]): Release | null {
 	const firsts = all
@@ -29,7 +30,10 @@ function pick(all: TmdbReleaseCountry[], types: number[]): Release | null {
 	return { date, countries, hu };
 }
 
-/** The first theatrical and digital releases, from TMDB's per-country release dates. */
+/** The first theatrical and home releases, from TMDB's per-country release dates. */
 export function pickReleases(countries: TmdbReleaseCountry[] | undefined): Releases {
-	return { theatrical: pick(countries ?? [], THEATRICAL), digital: pick(countries ?? [], DIGITAL) };
+	return {
+		theatrical: pick(countries ?? [], THEATRICAL),
+		home: pick(countries ?? [], HOME)?.date ?? null
+	};
 }

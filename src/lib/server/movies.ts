@@ -109,7 +109,10 @@ function buildViews(rows: Movie[], meId: number, voters?: ReadonlySet<number>): 
 			cast: people(m.meta.cast),
 			providers: m.meta.watch ?? { link: null, stream: [], rent: [] },
 			ageRating: m.meta.ageRating ?? null,
-			releases: m.meta.releases ?? { theatrical: null, digital: null },
+			releases: {
+				theatrical: m.meta.releases?.theatrical ?? null,
+				home: m.meta.releases?.home ?? null
+			},
 			addedAt: m.addedAt.getTime(),
 			addedBy: member(m.addedBy),
 			watchedAt: m.watchedAt?.getTime() ?? null,
@@ -340,7 +343,7 @@ export async function refreshStaleMeta(limit = 10) {
 		.where(
 			and(
 				isNull(schema.movies.deletedAt),
-				// Stale, or cached before `releaseDate` / credits / providers / age rating / releases existed (a JSON null means TMDB has none).
+				// Stale, or cached before `releaseDate` / credits / providers / age rating / home releases existed (a JSON null means TMDB has none).
 				or(
 					sql`${schema.movies.metaRefreshedAt} < ${Date.now() - WEEK}`,
 					sql`json_type(${schema.movies.meta}, '$.releaseDate') IS NULL`,
@@ -350,7 +353,7 @@ export async function refreshStaleMeta(limit = 10) {
 					sql`json_type(${schema.movies.meta}, '$.directors[0]') = 'text'`,
 					sql`json_type(${schema.movies.meta}, '$.watch') IS NULL`,
 					sql`json_type(${schema.movies.meta}, '$.ageRating') IS NULL`,
-					sql`json_type(${schema.movies.meta}, '$.releases') IS NULL`
+					sql`json_type(${schema.movies.meta}, '$.releases.home') IS NULL`
 				)
 			)
 		)
