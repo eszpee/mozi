@@ -3,7 +3,7 @@ import { PLEX_TOKEN, PLEX_URL, RADARR_API_KEY, RADARR_URL } from '$app/env/priva
 import { db, schema } from '#lib/server/db/index.ts';
 import {
 	computeAvailability,
-	type Availability,
+	type AvailabilityStatus,
 	tmdbIdsFromPlexGuids,
 	type RadarrMovie,
 	type RadarrQueueItem
@@ -67,10 +67,8 @@ export async function syncAvailability(): Promise<SyncResult> {
 		const syncedAt = new Date();
 		db.transaction((tx) => {
 			tx.delete(schema.availability).run();
-			for (const [tmdbId, a] of status) {
-				tx.insert(schema.availability)
-					.values({ tmdbId, ...a, syncedAt })
-					.run();
+			for (const [tmdbId, s] of status) {
+				tx.insert(schema.availability).values({ tmdbId, status: s, syncedAt }).run();
 			}
 		});
 		lastSync = { at: syncedAt.getTime(), count: status.size, error: null };
@@ -81,9 +79,9 @@ export async function syncAvailability(): Promise<SyncResult> {
 	return lastSync;
 }
 
-export function availabilityMap(): Map<number, Availability> {
+export function availabilityMap(): Map<number, AvailabilityStatus> {
 	const rows = db.select().from(schema.availability).all();
-	return new Map(rows.map((r) => [r.tmdbId, { status: r.status, expected: r.expected }]));
+	return new Map(rows.map((r) => [r.tmdbId, r.status]));
 }
 
 /** Shows a just-requested movie as "Keressük" until the next sync sees it in Radarr. */

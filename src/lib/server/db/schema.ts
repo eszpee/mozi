@@ -184,8 +184,6 @@ export const nightAttendees = sqliteTable(
 export const availability = sqliteTable('availability', {
 	tmdbId: integer('tmdb_id').primaryKey(),
 	status: text('status', { enum: ['plex', 'downloading', 'requested', 'waiting'] }).notNull(),
-	/** First home release (YYYY-MM-DD) of a movie that isn't out yet. */
-	expected: text('expected'),
 	syncedAt: timestamp('synced_at').notNull().default(now)
 });
 

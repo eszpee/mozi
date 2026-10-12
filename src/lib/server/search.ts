@@ -21,7 +21,7 @@ export async function search(query: string) {
 			title: displayTitle({ ...r, huTitle: null }),
 			year: r.year,
 			posterPath: r.posterPath,
-			availability: avail.get(r.tmdbId)?.status ?? null,
+			availability: avail.get(r.tmdbId) ?? null,
 			listedId: listed?.id ?? null,
 			watched: listed?.watched ?? false
 		};

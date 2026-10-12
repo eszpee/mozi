@@ -127,7 +127,7 @@ function buildViews(rows: Movie[], meId: number, voters?: ReadonlySet<number>): 
 				.length,
 			mySeen: ms.some((s) => s.userId === meId),
 			commentCount: commentCounts.get(m.id) ?? 0,
-			availability: avail.get(m.tmdbId)?.status ?? null
+			availability: avail.get(m.tmdbId) ?? null
 		};
 	});
 }
