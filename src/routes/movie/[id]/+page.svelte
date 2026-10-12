@@ -96,7 +96,7 @@
 		<div class="headline">
 			<AvailabilityBadge
 				status={movie.availability}
-				streams={movie.providers.stream}
+				offers={[...movie.providers.stream, ...movie.providers.rent]}
 				logos={false}
 				variant="inline"
 			/>

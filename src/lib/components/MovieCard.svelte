@@ -8,6 +8,7 @@
 	import { formatRuntime } from '#lib/ui.ts';
 
 	type Member = { id: number; nickname: string; avatarSeed: string };
+	type Offer = { name: string; logo: string };
 	let {
 		movie,
 		eager = false
@@ -20,7 +21,7 @@
 			rating: number | null;
 			posterPath: string | null;
 			availability: 'plex' | 'downloading' | 'requested' | null;
-			providers: { stream: { name: string; logo: string }[] };
+			providers: { stream: Offer[]; rent: Offer[] };
 			tally: Tally;
 			myVote: VoteValue | null;
 			seenBy: Member[];
@@ -41,7 +42,10 @@
 	<a class="link" href="/movie/{movie.id}">
 		<div class="poster-wrap">
 			<Poster path={movie.posterPath} title={movie.title.main} {eager} />
-			<AvailabilityBadge status={movie.availability} streams={movie.providers.stream} />
+			<AvailabilityBadge
+				status={movie.availability}
+				offers={[...movie.providers.stream, ...movie.providers.rent]}
+			/>
 			{#if movie.myVote === null}<span class="new" title="Még nem szavaztál">új</span>{/if}
 			<span class="added-by">
 				<Avatar

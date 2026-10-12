@@ -4,13 +4,13 @@
 	type Status = 'plex' | 'downloading' | 'requested';
 	let {
 		status,
-		streams = [],
+		offers = [],
 		logos = true,
 		variant = 'overlay'
 	}: {
 		status: Status | null;
-		/** Where it streams; any of them makes the movie available, like our own Plex. */
-		streams?: { name: string; logo: string }[];
+		/** Where it streams or rents; any of them makes the movie available, like our own Plex. */
+		offers?: { name: string; logo: string }[];
 		/** Lists the services after the label, Plex first. */
 		logos?: boolean;
 		variant?: 'overlay' | 'inline';
@@ -24,11 +24,11 @@
 	const MAX_LOGOS = 3;
 
 	let shown: keyof typeof LABELS | null = $derived(
-		status === 'plex' || streams.length ? 'available' : status
+		status === 'plex' || offers.length ? 'available' : status
 	);
 	let services = $derived([
 		...(status === 'plex' ? [{ name: 'Plex', src: '/providers/plex.svg' }] : []),
-		...streams.map((p) => ({ name: p.name, src: providerLogoUrl(p.logo) }))
+		...offers.map((p) => ({ name: p.name, src: providerLogoUrl(p.logo) }))
 	]);
 	let title = $derived(
 		shown === 'available' && services.length
