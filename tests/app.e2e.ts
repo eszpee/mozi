@@ -226,6 +226,40 @@ test.describe.serial('movie night', () => {
 		await expect(admin).toHaveURL(/\/movie\/\d+#comments$/);
 	});
 
+	test('new comments count until their movie is opened', async () => {
+		const badge = (page: Page) => page.locator('nav .badge');
+
+		// Bea's "Classic!" on Kontroll is still unread for Peter; the list alone doesn't clear it.
+		await go(admin, '/comments');
+		await expect(badge(admin)).toHaveText('1');
+		await expect(admin.locator('.conversation.unread')).toContainText('Kontroll');
+		await expect(admin.locator('.conversation.unread')).toContainText('1 új');
+		await go(admin, '/');
+		await expect(badge(admin)).toHaveText('1');
+
+		// Peter's "Fair enough" came after Bea last read Amélie.
+		await go(bea, '/');
+		await expect(badge(bea)).toHaveText('1');
+		await card(bea, 'Amélie').getByRole('link').first().click();
+		await expect(bea.locator('.comment').nth(1).locator('.new')).toHaveText('új');
+		await expect(badge(bea)).toHaveCount(0);
+		await bea.getByLabel('Hozzászólás írása').fill('Still too sweet');
+		await bea.getByRole('button', { name: 'Küldés' }).click();
+		await expect(bea.locator('.comment')).toHaveCount(3);
+		// Her own comment is not news to her.
+		await go(bea, '/');
+		await expect(badge(bea)).toHaveCount(0);
+
+		// Opening a movie straight from its card reads its thread too.
+		await go(admin, '/');
+		await expect(badge(admin)).toHaveText('2');
+		await card(admin, 'Kontroll').getByRole('link').first().click();
+		await expect(admin.locator('.comment .new')).toHaveCount(1);
+		await expect(badge(admin)).toHaveText('1');
+		await go(admin, '/');
+		await expect(badge(admin)).toHaveText('1');
+	});
+
 	test('only admins can remove movies', async () => {
 		await go(bea, '/');
 		await card(bea, 'Dune: Part Two').getByRole('link').first().click();

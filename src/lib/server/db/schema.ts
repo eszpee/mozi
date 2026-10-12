@@ -137,6 +137,24 @@ export const comments = sqliteTable(
 	(t) => [index('comments_movie_idx').on(t.movieId)]
 );
 
+/**
+ * When each member last opened a movie's comment thread. Comments by others posted after
+ * it (or, with no row, after the member joined) count as new for them.
+ */
+export const commentReads = sqliteTable(
+	'comment_reads',
+	{
+		userId: integer('user_id')
+			.notNull()
+			.references(() => users.id),
+		movieId: integer('movie_id')
+			.notNull()
+			.references(() => movies.id),
+		readAt: timestamp('read_at').notNull()
+	},
+	(t) => [primaryKey({ columns: [t.userId, t.movieId] })]
+);
+
 export const nights = sqliteTable('nights', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
 	label: text('label'),

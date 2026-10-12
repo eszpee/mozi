@@ -6,7 +6,8 @@ import {
 	addComment,
 	deleteComment,
 	editComment,
-	listComments
+	listComments,
+	markThreadRead
 } from '#lib/server/comments.ts';
 import { attendeeIds, openNight } from '#lib/server/nights.ts';
 import { activeMembers, toMember } from '#lib/server/users.ts';
@@ -28,7 +29,8 @@ export function load({ params, locals }) {
 	const attending = attendeeIds(night.id);
 	return {
 		movie,
-		comments: listComments(movie.id, me.id),
+		// Opening the movie reads its thread, however the member got here.
+		comments: listComments(movie.id, me.id, markThreadRead(movie.id, me.id)),
 		attendees: activeMembers()
 			.filter((m) => attending.has(m.id))
 			.map(toMember),

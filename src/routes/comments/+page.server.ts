@@ -1,5 +1,5 @@
 import { listConversations } from '#lib/server/comments.ts';
 
-export function load() {
-	return { conversations: listConversations() };
+export function load({ locals }) {
+	return { conversations: listConversations(locals.user!.id) };
 }

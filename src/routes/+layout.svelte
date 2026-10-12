@@ -28,6 +28,13 @@
 	}).format(new Date(__BUILD_DATE__));
 
 	// An icon stands in for a long label on narrow screens.
+	// The movie being viewed is read as this page loads, possibly after the layout counted it.
+	let unread = $derived(
+		data.unreadThreads.filter(
+			(id) => !(page.route.id === '/movie/[id]' && String(id) === page.params.id)
+		).length
+	);
+
 	const nav: { href: string; label: string; icon?: string }[] = [
 		{ href: '/', label: 'Filmek' },
 		{ href: '/comments', label: 'Beszélgetések', icon: '💬' },
@@ -54,7 +61,9 @@
 					<a
 						href={item.href}
 						aria-current={page.url.pathname === item.href ? 'page' : undefined}
-						aria-label={item.icon ? item.label : undefined}
+						aria-label={item.icon
+							? `${item.label}${item.href === '/comments' && unread ? `, ${unread} új` : ''}`
+							: undefined}
 						title={item.icon ? item.label : undefined}
 					>
 						{#if item.icon}
@@ -62,6 +71,9 @@
 							<span class="nav-label" aria-hidden="true">{item.label}</span>
 						{:else}
 							{item.label}
+						{/if}
+						{#if item.href === '/comments' && unread}
+							<span class="badge" aria-hidden="true">{unread}</span>
 						{/if}
 					</a>
 				{/each}
@@ -144,6 +156,20 @@
 		font-weight: 550;
 		font-size: 14px;
 		white-space: nowrap;
+	}
+
+	.badge {
+		display: inline-block;
+		min-width: 18px;
+		margin-left: 4px;
+		padding: 0 5px;
+		border-radius: 999px;
+		background: var(--accent);
+		color: var(--accent-ink);
+		font-size: 11px;
+		font-weight: 750;
+		line-height: 18px;
+		text-align: center;
 	}
 
 	nav a[aria-current='page'] {

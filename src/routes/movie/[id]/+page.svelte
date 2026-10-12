@@ -39,6 +39,17 @@
 		{ emoji: '👎', people: movie.votes.filter((v) => v.value === -1) }
 	]);
 	let watched = $derived(movie.watchedAt !== null);
+
+	// Reloads after a vote or comment re-read the thread; keep the "új" marks from arrival.
+	let arrival = { movieId: -1, ids: new Set<number>() };
+	let newIds = $derived.by(() => {
+		if (arrival.movieId !== movie.id)
+			arrival = {
+				movieId: movie.id,
+				ids: new Set(data.comments.filter((c) => c.isNew).map((c) => c.id))
+			};
+		return arrival.ids;
+	});
 	// Our own Plex first: if it's downloaded, that's the easiest way to watch it.
 	const logo = (p: { name: string; logo: string; url: string | null }) => ({
 		name: p.name,
@@ -273,6 +284,7 @@
 						<div class="bubble">
 							<p class="meta">
 								<strong>{c.author.nickname}</strong>
+								{#if newIds.has(c.id)}<span class="new">új</span>{/if}
 								{#if c.authorVote !== null}<span title="Szavazata">{voteEmoji(c.authorVote)}</span
 									>{/if}
 								<span class="faint">{timeAgo(c.createdAt)}{c.edited ? ' · szerkesztve' : ''}</span>
@@ -647,6 +659,16 @@
 
 	.text {
 		margin: 0;
+	}
+
+	.new {
+		padding: 0 6px;
+		border-radius: 999px;
+		background: var(--accent);
+		color: var(--accent-ink);
+		font-size: 10.5px;
+		font-weight: 750;
+		align-self: center;
 	}
 
 	.tools {

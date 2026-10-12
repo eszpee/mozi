@@ -14,12 +14,15 @@
 		<ul class="list">
 			{#each data.conversations as c (c.movieId)}
 				<li>
-					<a class="conversation" href="/movie/{c.movieId}#comments">
+					<a class="conversation" class:unread={c.newCount} href="/movie/{c.movieId}#comments">
 						<div class="thumb">
 							<Poster path={c.posterPath} title={c.title.main} sizes="72px" />
 						</div>
 						<div class="info">
-							<p class="title">{c.title.main}</p>
+							<p class="title">
+								{c.title.main}
+								{#if c.newCount}<span class="new">{c.newCount} új</span>{/if}
+							</p>
 							<div class="latest">
 								<Avatar seed={c.latest.author.avatarSeed} size={24} />
 								<p class="meta">
@@ -73,6 +76,21 @@
 		border: 1px solid var(--line);
 		text-decoration: none;
 		color: inherit;
+	}
+
+	.conversation.unread {
+		border-color: var(--accent);
+	}
+
+	.new {
+		margin-left: 6px;
+		padding: 1px 7px;
+		border-radius: 999px;
+		background: var(--accent);
+		color: var(--accent-ink);
+		font-size: 11px;
+		font-weight: 750;
+		vertical-align: 2px;
 	}
 
 	.conversation:hover {
