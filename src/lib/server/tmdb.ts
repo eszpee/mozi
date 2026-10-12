@@ -1,6 +1,6 @@
 import { dev } from '$app/env';
 import { TMDB_TOKEN } from '$app/env/private';
-import type { MovieMeta } from '#lib/server/db/schema.ts';
+import type { MovieMeta, Person } from '#lib/server/db/schema.ts';
 import { FIXTURE_MOVIES } from './tmdb-fixtures.ts';
 import { parseWatchLinks, summarizeProviders, type TmdbCountryProviders } from './providers.ts';
 import { pickAgeRating } from './age-rating.ts';
@@ -98,8 +98,21 @@ type TmdbDetails = {
 		results: { iso_3166_1: string; release_dates: { certification: string }[] }[];
 	};
 	'watch/providers'?: { results: Record<string, TmdbCountryProviders> };
-	credits?: { cast: { name: string; order: number }[]; crew: { name: string; job: string }[] };
+	credits?: {
+		cast: { id: number; name: string; order: number }[];
+		crew: { id: number; name: string; job: string }[];
+	};
 };
+
+/** Adds a person's IMDb id; without one the page links to their TMDB page instead. */
+async function withImdb(p: { id: number; name: string }): Promise<Person> {
+	try {
+		const ids = await tmdb<{ imdb_id: string | null }>(`/person/${p.id}/external_ids`, {});
+		return { name: p.name, tmdbId: p.id, imdbId: ids.imdb_id || null };
+	} catch {
+		return { name: p.name, tmdbId: p.id, imdbId: null };
+	}
+}
 
 /** Deep links from TMDB's public watch page; empty if it can't be read (logos then fall back to search). */
 async function watchPageLinks(url: string | undefined): Promise<Map<number, string>> {
@@ -145,6 +158,16 @@ export async function fetchMovieMeta(tmdbId: number): Promise<MovieMeta> {
 		? d.images?.posters.find((p) => p.iso_639_1 === 'hu')?.file_path
 		: undefined;
 
+	const [directors, cast] = await Promise.all([
+		Promise.all((d.credits?.crew ?? []).filter((c) => c.job === 'Director').map(withImdb)),
+		Promise.all(
+			(d.credits?.cast ?? [])
+				.toSorted((a, b) => a.order - b.order)
+				.slice(0, 3)
+				.map(withImdb)
+		)
+	]);
+
 	return {
 		title: d.title,
 		originalTitle: d.original_title,
@@ -160,11 +183,8 @@ export async function fetchMovieMeta(tmdbId: number): Promise<MovieMeta> {
 		rating: d.vote_count > 0 ? Math.round(d.vote_average * 10) / 10 : null,
 		imdbId: d.imdb_id || null,
 		trailerKey: pickTrailer(d.videos?.results ?? [], d.original_language),
-		directors: (d.credits?.crew ?? []).filter((c) => c.job === 'Director').map((c) => c.name),
-		cast: (d.credits?.cast ?? [])
-			.toSorted((a, b) => a.order - b.order)
-			.slice(0, 3)
-			.map((c) => c.name),
+		directors,
+		cast,
 		watch: summarizeProviders(huWatch, await watchPageLinks(huWatch?.link)),
 		ageRating: pickAgeRating(d.release_dates?.results)
 	};

@@ -21,8 +21,12 @@ export const FIXTURE_MOVIES: { tmdbId: number; meta: MovieMeta }[] = [
 			rating: 7.9,
 			imdbId: 'tt0211915',
 			trailerKey: '555A7T_kmIc',
-			directors: ['Jean-Pierre Jeunet'],
-			cast: ['Audrey Tautou', 'Mathieu Kassovitz', 'Rufus'],
+			directors: [{ name: 'Jean-Pierre Jeunet', tmdbId: 2419, imdbId: 'nm0000466' }],
+			cast: [
+				{ name: 'Audrey Tautou', tmdbId: 2405, imdbId: 'nm0851582' },
+				{ name: 'Mathieu Kassovitz', tmdbId: 2406, imdbId: 'nm0440913' },
+				{ name: 'Rufus', tmdbId: 2407, imdbId: 'nm0749363' }
+			],
 			watch: {
 				link: null,
 				stream: [],
@@ -47,8 +51,12 @@ export const FIXTURE_MOVIES: { tmdbId: number; meta: MovieMeta }[] = [
 			rating: 7.2,
 			imdbId: 'tt0373981',
 			trailerKey: 'Dx5Rt2BPLLc',
-			directors: ['Nimród Antal'],
-			cast: ['Sándor Csányi', 'Zoltán Mucsi', 'Csaba Pindroch'],
+			directors: [{ name: 'Nimród Antal', tmdbId: 41671, imdbId: 'nm0030735' }],
+			cast: [
+				{ name: 'Sándor Csányi', tmdbId: 42067, imdbId: 'nm0190800' },
+				{ name: 'Zoltán Mucsi', tmdbId: 42069, imdbId: 'nm0610904' },
+				{ name: 'Csaba Pindroch', tmdbId: 42068, imdbId: 'nm0683950' }
+			],
 			watch: { link: null, stream: [], rent: [] },
 			ageRating: 16
 		}
@@ -69,8 +77,12 @@ export const FIXTURE_MOVIES: { tmdbId: number; meta: MovieMeta }[] = [
 			rating: 7.1,
 			imdbId: 'tt3808342',
 			trailerKey: 'PSabBa9IWYs',
-			directors: ['László Nemes'],
-			cast: ['Géza Röhrig', 'Levente Molnár', 'Urs Rechn'],
+			directors: [{ name: 'László Nemes', tmdbId: 1454941, imdbId: 'nm1841577' }],
+			cast: [
+				{ name: 'Géza Röhrig', tmdbId: 1454942, imdbId: 'nm2764022' },
+				{ name: 'Levente Molnár', tmdbId: 1454944, imdbId: 'nm4112928' },
+				{ name: 'Urs Rechn', tmdbId: 1457026, imdbId: 'nm0714455' }
+			],
 			watch: { link: null, stream: [], rent: [] },
 			ageRating: 16
 		}
@@ -91,8 +103,12 @@ export const FIXTURE_MOVIES: { tmdbId: number; meta: MovieMeta }[] = [
 			rating: 8.1,
 			imdbId: 'tt15239678',
 			trailerKey: 'U2Qp5pL3ovA',
-			directors: ['Denis Villeneuve'],
-			cast: ['Timothée Chalamet', 'Zendaya', 'Rebecca Ferguson'],
+			directors: [{ name: 'Denis Villeneuve', tmdbId: 137427, imdbId: 'nm0898288' }],
+			cast: [
+				{ name: 'Timothée Chalamet', tmdbId: 1190668, imdbId: 'nm3154303' },
+				{ name: 'Zendaya', tmdbId: 505710, imdbId: 'nm3918035' },
+				{ name: 'Rebecca Ferguson', tmdbId: 933238, imdbId: 'nm0272581' }
+			],
 			watch: { link: null, stream: [], rent: [] },
 			ageRating: 12
 		}
@@ -113,8 +129,12 @@ export const FIXTURE_MOVIES: { tmdbId: number; meta: MovieMeta }[] = [
 			rating: 8.6,
 			imdbId: 'tt0050083',
 			trailerKey: 'TEN-2uTi2c0',
-			directors: ['Sidney Lumet'],
-			cast: ['Henry Fonda', 'Lee J. Cobb', 'Martin Balsam'],
+			directors: [{ name: 'Sidney Lumet', tmdbId: 39996, imdbId: 'nm0001486' }],
+			cast: [
+				{ name: 'Martin Balsam', tmdbId: 1936, imdbId: 'nm0000842' },
+				{ name: 'John Fiedler', tmdbId: 5247, imdbId: 'nm0275835' },
+				{ name: 'Lee J. Cobb', tmdbId: 5248, imdbId: 'nm0002011' }
+			],
 			watch: { link: null, stream: [], rent: [] },
 			ageRating: 0
 		}
@@ -135,8 +155,12 @@ export const FIXTURE_MOVIES: { tmdbId: number; meta: MovieMeta }[] = [
 			rating: 8.4,
 			imdbId: 'tt1375666',
 			trailerKey: 'cdx31ak4KbQ',
-			directors: ['Christopher Nolan'],
-			cast: ['Leonardo DiCaprio', 'Joseph Gordon-Levitt', 'Ken Watanabe'],
+			directors: [{ name: 'Christopher Nolan', tmdbId: 525, imdbId: 'nm0634240' }],
+			cast: [
+				{ name: 'Leonardo DiCaprio', tmdbId: 6193, imdbId: 'nm0000138' },
+				{ name: 'Joseph Gordon-Levitt', tmdbId: 24045, imdbId: 'nm0330687' },
+				{ name: 'Ken Watanabe', tmdbId: 3899, imdbId: 'nm0913822' }
+			],
 			watch: {
 				link: null,
 				stream: [{ name: 'Netflix', logo: '/pbpMk2JmcoNnQwx5JGpXngfoWtp.jpg', url: null }],

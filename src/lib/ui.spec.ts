@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { languageName, providerUrl } from './ui.ts';
+import { languageName, personUrl, providerUrl } from './ui.ts';
 
 describe('languageName', () => {
 	it('names languages in Hungarian', () => {
@@ -42,5 +42,17 @@ describe('providerUrl', () => {
 		const tmdb = 'https://www.themoviedb.org/movie/27205/watch?locale=HU';
 		expect(providerUrl('Filmio', 'Inception', tmdb)).toBe(tmdb);
 		expect(providerUrl('Filmio', 'Inception', null)).toBeNull();
+	});
+});
+
+describe('personUrl', () => {
+	it('prefers IMDb, falls back to TMDB, and gives nothing for a bare name', () => {
+		expect(personUrl({ tmdbId: 2419, imdbId: 'nm0000466' })).toBe(
+			'https://www.imdb.com/name/nm0000466/'
+		);
+		expect(personUrl({ tmdbId: 2419, imdbId: null })).toBe(
+			'https://www.themoviedb.org/person/2419'
+		);
+		expect(personUrl({ tmdbId: null, imdbId: null })).toBeNull();
 	});
 });

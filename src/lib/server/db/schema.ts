@@ -40,6 +40,9 @@ export const invites = sqliteTable('invites', {
 	revokedAt: timestamp('revoked_at')
 });
 
+/** A credited person; ids are missing on names cached before links were added. */
+export type Person = { name: string; tmdbId: number | null; imdbId: string | null };
+
 export type MovieMeta = {
 	title: string;
 	originalTitle: string;
@@ -56,9 +59,9 @@ export type MovieMeta = {
 	imdbId: string | null;
 	trailerKey: string | null;
 	/** Missing on movies cached before credits were added. */
-	directors?: string[];
+	directors?: (Person | string)[];
 	/** Top-billed cast, at most three. */
-	cast?: string[];
+	cast?: (Person | string)[];
 	/** Where it streams in Hungary (TMDB / JustWatch), with deep links. Missing on movies cached before. */
 	watch?: Providers;
 	/** Minimum age (Hungarian rating, else German). Missing on movies cached before. */

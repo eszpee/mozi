@@ -10,6 +10,7 @@
 		formatDate,
 		formatRuntime,
 		languageName,
+		personUrl,
 		posterUrl,
 		providerLogoUrl,
 		providerUrl,
@@ -73,6 +74,13 @@
 				eager
 				sizes="(min-width: 640px) 220px, 130px"
 			/>
+			<span class="added-by">
+				<Avatar
+					seed={movie.addedBy.avatarSeed}
+					name="Ajánlotta: {movie.addedBy.nickname}"
+					size={32}
+				/>
+			</span>
 		</div>
 		<div class="headline">
 			<AvailabilityBadge status={movie.availability} variant="inline" />
@@ -85,14 +93,19 @@
 			{#if languageName(movie.originalLanguage)}
 				<p class="details">Eredeti nyelv: {languageName(movie.originalLanguage)}</p>
 			{/if}
-			{#if movie.directors.length}
-				<p class="details">
-					{movie.directors.length > 1 ? 'Rendezők' : 'Rendező'}: {movie.directors.join(', ')}
-				</p>
-			{/if}
-			{#if movie.cast.length}
-				<p class="details">Főszereplők: {movie.cast.join(', ')}</p>
-			{/if}
+			{#each [{ label: movie.directors.length > 1 ? 'Rendezők' : 'Rendező', people: movie.directors }, { label: 'Főszereplők', people: movie.cast }] as row (row.label)}
+				{#if row.people.length}
+					<p class="details">
+						{row.label}:
+						{#each row.people as p, i (i)}{@const url = personUrl(p)}{#if url}<a
+									class="person-link"
+									href={url}
+									target="_blank"
+									rel="noopener noreferrer">{p.name}</a
+								>{:else}{p.name}{/if}{i < row.people.length - 1 ? ', ' : ''}{/each}
+					</p>
+				{/if}
+			{/each}
 			{#each [{ label: 'Elérhető', list: streams }, { label: 'Bérelhető', list: rentals }] as row (row.label)}
 				{#if row.list.length}
 					<div class="providers">
@@ -393,8 +406,31 @@
 	}
 
 	.poster {
+		position: relative;
 		box-shadow: var(--shadow);
 		border-radius: var(--radius);
+	}
+
+	/* Same treatment as on the movie cards. */
+	.added-by {
+		position: absolute;
+		left: 8px;
+		bottom: 8px;
+		display: flex;
+		padding: 2px;
+		border-radius: 50%;
+		background: rgb(0 0 0 / 0.45);
+		box-shadow: 0 2px 10px rgb(0 0 0 / 0.4);
+	}
+
+	.person-link {
+		color: inherit;
+		text-decoration-color: var(--line-strong);
+		text-underline-offset: 3px;
+	}
+
+	.person-link:hover {
+		color: var(--text);
 	}
 
 	.headline {

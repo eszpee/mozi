@@ -50,6 +50,12 @@ export function trailerUrl(key: string | null, title: string, year: number | nul
 		: `https://www.youtube.com/results?search_query=${encodeURIComponent(`${title} ${year ?? ''} trailer`)}`;
 }
 
+/** A person's IMDb page, else their TMDB page; null for names cached without ids. */
+export function personUrl(p: { tmdbId: number | null; imdbId: string | null }) {
+	if (p.imdbId) return `https://www.imdb.com/name/${encodeURIComponent(p.imdbId)}/`;
+	return p.tmdbId ? `https://www.themoviedb.org/person/${p.tmdbId}` : null;
+}
+
 const dateFmt = new Intl.DateTimeFormat('hu-HU', {
 	day: 'numeric',
 	month: 'short',

@@ -96,6 +96,15 @@ test.describe.serial('movie night', () => {
 		await recommend(admin, 'amel', /Amélie/);
 		await expect(admin.getByRole('heading', { name: 'Amélie', level: 1 })).toBeVisible();
 		await expect(admin.getByText("Le Fabuleux Destin d'Amélie Poulain")).toBeVisible();
+		await expect(admin.getByRole('link', { name: 'Jean-Pierre Jeunet' })).toHaveAttribute(
+			'href',
+			'https://www.imdb.com/name/nm0000466/'
+		);
+		await expect(admin.getByRole('link', { name: 'Audrey Tautou' })).toHaveAttribute(
+			'href',
+			'https://www.imdb.com/name/nm0851582/'
+		);
+		await expect(admin.locator('.poster').getByRole('img', { name: /^Ajánlotta: / })).toBeVisible();
 		await expect(admin.getByRole('button', { name: /Megnézném \(1\)/ })).toHaveAttribute(
 			'aria-pressed',
 			'true'

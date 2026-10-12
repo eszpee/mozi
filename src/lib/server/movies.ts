@@ -1,6 +1,6 @@
 import { and, desc, eq, inArray, isNotNull, isNull, or, sql } from 'drizzle-orm';
 import { db, schema } from '#lib/server/db/index.ts';
-import type { Movie } from '#lib/server/db/schema.ts';
+import type { Movie, Person } from '#lib/server/db/schema.ts';
 import { displayTitle, type DisplayTitle } from '#lib/titles.ts';
 import { tally, type Tally, type VoteValue } from '#lib/scoring.ts';
 import { toMember, type Member } from '#lib/server/users.ts';
@@ -26,8 +26,8 @@ export type MovieView = {
 	posterPath: string | null;
 	imdbId: string | null;
 	trailerKey: string | null;
-	directors: string[];
-	cast: string[];
+	directors: Person[];
+	cast: Person[];
 	providers: Providers;
 	ageRating: AgeRating | null;
 	addedAt: number;
@@ -46,6 +46,10 @@ export type MovieView = {
 	commentCount: number;
 	availability: AvailabilityStatus | null;
 };
+
+/** Credits cached before links were added are bare names; they show unlinked until the refresh. */
+const people = (list: (Person | string)[] = []): Person[] =>
+	list.map((p) => (typeof p === 'string' ? { name: p, tmdbId: null, imdbId: null } : p));
 
 function membersById(): Map<number, Member> {
 	return new Map(
@@ -99,8 +103,8 @@ function buildViews(rows: Movie[], meId: number, voters?: ReadonlySet<number>): 
 			posterPath: m.meta.posterPath,
 			imdbId: m.meta.imdbId,
 			trailerKey: m.meta.trailerKey,
-			directors: m.meta.directors ?? [],
-			cast: m.meta.cast ?? [],
+			directors: people(m.meta.directors),
+			cast: people(m.meta.cast),
 			providers: m.meta.watch ?? { link: null, stream: [], rent: [] },
 			ageRating: m.meta.ageRating ?? null,
 			addedAt: m.addedAt.getTime(),
@@ -338,6 +342,9 @@ export async function refreshStaleMeta(limit = 10) {
 					sql`${schema.movies.metaRefreshedAt} < ${Date.now() - WEEK}`,
 					sql`json_type(${schema.movies.meta}, '$.releaseDate') IS NULL`,
 					sql`json_type(${schema.movies.meta}, '$.cast') IS NULL`,
+					// Credits cached as bare names, before person links.
+					sql`json_type(${schema.movies.meta}, '$.cast[0]') = 'text'`,
+					sql`json_type(${schema.movies.meta}, '$.directors[0]') = 'text'`,
 					sql`json_type(${schema.movies.meta}, '$.watch') IS NULL`,
 					sql`json_type(${schema.movies.meta}, '$.ageRating') IS NULL`
 				)
