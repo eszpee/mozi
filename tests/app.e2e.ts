@@ -279,6 +279,25 @@ test.describe.serial('movie night', () => {
 		expect(await res.text()).toContain('403');
 	});
 
+	test('the vote matrix is admin-only and shows each vote', async () => {
+		await go(admin, '/');
+		await admin.getByLabel('Fiókmenü').click();
+		await admin.getByRole('link', { name: 'Szavazatok' }).click();
+		await expect(admin).toHaveURL('/admin/votes');
+		const header = await admin.locator('thead th .name').allTextContents();
+		const amelie = admin.locator('tbody tr').filter({ hasText: 'Amélie' });
+		const cells = await amelie.locator('td').allTextContents();
+		expect(cells[header.indexOf('Peter')].trim()).toBe('👍');
+		expect(cells[header.indexOf('Bea')].trim()).toBe('👎');
+		await expect(amelie.getByRole('img', { name: 'Ajánlotta: Peter' })).toBeVisible();
+
+		await go(bea, '/');
+		await bea.getByLabel('Fiókmenü').click();
+		await expect(bea.getByRole('link', { name: 'Szavazatok' })).toHaveCount(0);
+		const res = await bea.request.get('/admin/votes');
+		expect(res.status()).toBe(404);
+	});
+
 	test('watching a movie archives it, marks attendees seen and rolls the night over', async () => {
 		await go(admin, '/');
 		await card(admin, 'Kontroll').getByRole('link').first().click();
@@ -342,13 +361,13 @@ test.describe.serial('movie night', () => {
 		const movie = await card(admin, 'Amélie').getByRole('link').first().getAttribute('href');
 		for (const width of [320, 375, 402, 412]) {
 			await admin.setViewportSize({ width, height: 800 });
-			for (const path of ['/', movie!, '/add', '/watched', '/night', '/admin']) {
+			for (const path of ['/', movie!, '/add', '/watched', '/night', '/admin', '/admin/votes']) {
 				await go(admin, path);
 				// Nothing may stick out to the right, even if clipped (iOS Safari pans to it).
 				const sticking = await admin.evaluate(() => {
 					const vw = document.documentElement.clientWidth;
 					return [...document.querySelectorAll('body *')]
-						.filter((e) => !e.closest('.sorts, .hero'))
+						.filter((e) => !e.closest('.sorts, .hero, .matrix'))
 						.filter((e) => e.getBoundingClientRect().right > vw + 0.5)
 						.map((e) => e.className);
 				});
