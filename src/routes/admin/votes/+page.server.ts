@@ -36,7 +36,10 @@ export function load({ locals }) {
 				.all()
 		: [];
 	const byMovie = new Map<number, Record<number, VoteValue>>();
+	// Only the members shown as columns count; removed members' votes stay out of the totals.
+	const shown = new Set(members.map((m) => m.id));
 	for (const v of votes) {
+		if (!shown.has(v.userId)) continue;
 		const row = byMovie.get(v.movieId) ?? {};
 		row[v.userId] = v.value as VoteValue;
 		byMovie.set(v.movieId, row);

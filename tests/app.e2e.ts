@@ -357,6 +357,16 @@ test.describe.serial('movie night', () => {
 		await row.getByRole('button', { name: 'Eltávolítás' }).click();
 		await expect(row).toContainText('eltávolítva');
 
+		// A removed member's votes leave the vote matrix and its totals (Bea's 👎 on Amélie).
+		await go(admin, '/admin/votes');
+		await expect(admin.locator('thead th .name')).not.toContainText(['Bea']);
+		const amelie = admin.locator('tbody tr').filter({ hasText: 'Amélie' });
+		expect((await amelie.locator('td').allTextContents()).slice(-3).map((c) => c.trim())).toEqual([
+			'1',
+			'',
+			''
+		]);
+
 		await go(bea, '/');
 		await expect(bea).toHaveURL('/login');
 	});

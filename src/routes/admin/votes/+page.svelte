@@ -12,7 +12,15 @@
 
 	let rowTotals = $derived(
 		new Map(
-			data.rows.map((r) => [r.id, VOTE_OPTIONS.map((o) => count(Object.values(r.votes), o.value))])
+			data.rows.map((r) => [
+				r.id,
+				VOTE_OPTIONS.map((o) =>
+					count(
+						data.members.map((m) => r.votes[m.id]),
+						o.value
+					)
+				)
+			])
 		)
 	);
 	let columnTotals = $derived(
