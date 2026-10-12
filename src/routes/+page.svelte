@@ -137,7 +137,7 @@
 						class="chip"
 						type="button"
 						aria-pressed={filters.inPlex}
-						onclick={() => (filters.inPlex = !filters.inPlex)}>▶ Elérhető</button
+						onclick={() => (filters.inPlex = !filters.inPlex)}>🍿 Elérhető</button
 					>
 				</div>
 				<div class="segmented" role="group" aria-label="Kinek a szavazata számít">

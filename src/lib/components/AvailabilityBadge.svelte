@@ -20,7 +20,7 @@
 	} = $props();
 
 	const LABELS = {
-		available: { icon: '▶', text: 'Elérhető' },
+		available: { icon: '🍿', text: 'Elérhető' },
 		downloading: { icon: '↓', text: 'Töltődik' },
 		requested: { icon: '🔍', text: 'Keressük' },
 		waiting: { icon: '⏳', text: 'Várjuk' }
@@ -97,7 +97,7 @@
 		box-shadow: 0 2px 10px rgb(0 0 0 / 0.4);
 	}
 
-	/* On a narrow card, a long row of logos takes the label's place; the ▶ still says "available". */
+	/* On a narrow card, a long row of logos takes the label's place; the 🍿 still says "available". */
 	@container (max-width: 210px) {
 		.overlay.crowded .text {
 			display: none;
