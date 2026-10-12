@@ -110,7 +110,7 @@
 	}
 
 	.requested {
-		background: rgb(27 27 37 / 0.9);
+		background: light-dark(rgb(255 255 255 / 0.9), rgb(27 27 37 / 0.9));
 		color: var(--text-muted);
 		border: 1px solid var(--line-strong);
 	}

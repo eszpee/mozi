@@ -25,7 +25,7 @@
 		width: 100%;
 		background: #fff;
 		color: #1f1f1f;
-		border-color: #fff;
+		border-color: light-dark(#dadce0, #fff);
 	}
 
 	.google:hover {

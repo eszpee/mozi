@@ -4,6 +4,29 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 		<meta name="text-scale" content="scale" />
+		<meta
+			name="theme-color"
+			content="#f6f4ef"
+			data-color="#f6f4ef"
+			media="(prefers-color-scheme: light)"
+		/>
+		<meta
+			name="theme-color"
+			content="#0b0b10"
+			data-color="#0b0b10"
+			media="(prefers-color-scheme: dark)"
+		/>
+		<script nonce="%sveltekit.nonce%">
+			// Applies a theme picked with the header toggle before first paint, so it never flashes.
+			try {
+				const theme = localStorage.getItem('mozi.theme');
+				if (theme === 'light' || theme === 'dark') {
+					document.documentElement.dataset.theme = theme;
+					for (const meta of document.querySelectorAll('meta[name="theme-color"]'))
+						meta.content = theme === 'light' ? '#f6f4ef' : '#0b0b10';
+				}
+			} catch {}
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

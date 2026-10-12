@@ -406,9 +406,13 @@ test.describe.serial('movie night', () => {
 						.map((e) => e.className);
 				});
 				expect(sticking, `${width}px ${path}`).toEqual([]);
-				// iOS zooms in on fields under 16px, and the zoomed page pans sideways.
+				// iOS zooms in on text fields under 16px, and the zoomed page pans sideways.
 				const small = await admin.evaluate(() =>
-					[...document.querySelectorAll('input:not([type=hidden], [readonly]), textarea, select')]
+					[
+						...document.querySelectorAll(
+							'input:not([type=hidden], [type=radio], [type=checkbox], [readonly]), textarea, select'
+						)
+					]
 						.filter((e) => parseFloat(getComputedStyle(e).fontSize) < 16)
 						.map((e) => e.getAttribute('name'))
 				);
@@ -416,4 +420,43 @@ test.describe.serial('movie night', () => {
 			}
 		}
 	});
+});
+
+test('theme is automatic, light or dark, and a picked one sticks', async ({ browser }) => {
+	const page = await signIn(browser, 'theme', 'Tamás');
+	await page.emulateMedia({ colorScheme: 'light' });
+	const background = () => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+	const LIGHT = 'rgb(246, 244, 239)';
+	const DARK = 'rgb(11, 11, 16)';
+	const pick = async (name: string) => {
+		await page.getByLabel('Fiókmenü').click();
+		await page.getByRole('radio', { name }).check();
+	};
+
+	await page.getByLabel('Fiókmenü').click();
+	await expect(page.getByRole('radio', { name: 'Automatikus' })).toBeChecked();
+	expect(await background()).toBe(LIGHT);
+
+	await page.getByRole('radio', { name: 'Sötét' }).check();
+	expect(await background()).toBe(DARK);
+
+	// Survives a reload, and wins over the device.
+	await go(page, '/');
+	await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+	await expect(page.locator('meta[name="theme-color"]').first()).toHaveAttribute(
+		'content',
+		'#0b0b10'
+	);
+	await page.getByLabel('Fiókmenü').click();
+	await expect(page.getByRole('radio', { name: 'Sötét' })).toBeChecked();
+
+	await page.getByRole('radio', { name: 'Világos' }).check();
+	await page.emulateMedia({ colorScheme: 'dark' });
+	expect(await background()).toBe(LIGHT);
+
+	// Automatikus clears the choice, and the device decides again.
+	await go(page, '/');
+	await pick('Automatikus');
+	await expect(page.locator('html')).not.toHaveAttribute('data-theme');
+	expect(await background()).toBe(DARK);
 });

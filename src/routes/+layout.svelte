@@ -35,6 +35,34 @@
 		).length
 	);
 
+	// 'auto' (nothing stored) lets the device decide; app.html applies a stored choice before paint.
+	type Theme = 'auto' | 'light' | 'dark';
+	const THEME_KEY = 'mozi.theme';
+	const THEMES: { value: Theme; label: string }[] = [
+		{ value: 'auto', label: 'Automatikus' },
+		{ value: 'light', label: 'Világos' },
+		{ value: 'dark', label: 'Sötét' }
+	];
+	let theme: Theme = $state('auto');
+	onMount(() => {
+		theme = (document.documentElement.dataset.theme as Theme | undefined) ?? 'auto';
+	});
+
+	function setTheme(next: Theme) {
+		const root = document.documentElement;
+		if (next === 'auto') delete root.dataset.theme;
+		else root.dataset.theme = next;
+		for (const meta of document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]'))
+			meta.content =
+				next === 'auto' ? meta.dataset.color! : next === 'light' ? '#f6f4ef' : '#0b0b10';
+		try {
+			if (next === 'auto') localStorage.removeItem(THEME_KEY);
+			else localStorage.setItem(THEME_KEY, next);
+		} catch {
+			// Storage blocked (private mode): the theme holds until the page reloads.
+		}
+	}
+
 	const nav: { href: string; label: string; icon?: string }[] = [
 		{ href: '/', label: 'Filmek' },
 		{ href: '/comments', label: 'Beszélgetések', icon: '💬' },
@@ -47,8 +75,7 @@
 	<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 	<link rel="manifest" href="/manifest.webmanifest" />
 	<meta name="apple-mobile-web-app-capable" content="yes" />
-	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-	<meta name="theme-color" content="#0b0b10" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 	<title>mozi</title>
 </svelte:head>
 
@@ -92,6 +119,23 @@
 				<div class="menu card">
 					<p class="who">{data.me.nickname}</p>
 					<a href="/welcome">Név és kép</a>
+					<fieldset class="theme">
+						<legend>Téma</legend>
+						<div class="segments">
+							{#each THEMES as option (option.value)}
+								<label>
+									<input
+										type="radio"
+										name="theme"
+										value={option.value}
+										bind:group={theme}
+										onchange={() => setTheme(option.value)}
+									/>
+									{option.label}
+								</label>
+							{/each}
+						</div>
+					</fieldset>
 					{#if data.me.admin}<a href="/admin">Admin</a>
 						<a href="/admin/votes">Szavazatok</a>{/if}
 					<form method="POST" action="/auth/logout">
@@ -118,11 +162,11 @@
 		position: sticky;
 		top: 0;
 		z-index: 20;
-		background: rgb(11 11 16 / 0.82);
+		background: var(--header-bg);
 		backdrop-filter: blur(14px);
 		-webkit-backdrop-filter: blur(14px);
 		border-bottom: 1px solid var(--line);
-		/* Home-screen app on iOS draws under the status bar. */
+		/* Clears a notch or status bar the page is drawn under (0 with the iOS default status bar). */
 		padding-top: env(safe-area-inset-top);
 	}
 
@@ -232,6 +276,57 @@
 		}
 	}
 
+	.theme {
+		margin: 4px 0;
+		padding: 6px 10px 8px;
+		border: 0;
+	}
+
+	.theme legend {
+		padding: 0 0 6px;
+		font-size: 12px;
+		color: var(--text-faint);
+	}
+
+	.segments {
+		display: flex;
+		padding: 3px;
+		border-radius: 999px;
+		background: var(--bg-sunken);
+		border: 1px solid var(--line);
+	}
+
+	.segments label {
+		position: relative;
+		flex: 1;
+		padding: 5px 8px;
+		border-radius: 999px;
+		text-align: center;
+		font-size: 13px;
+		font-weight: 550;
+		color: var(--text-muted);
+		cursor: pointer;
+	}
+
+	.segments label:has(:checked) {
+		background: var(--surface-hover);
+		color: var(--text);
+	}
+
+	.segments label:has(:focus-visible) {
+		outline: 2px solid var(--accent);
+		outline-offset: 1px;
+	}
+
+	/* The real radio, invisible, covers its segment, so taps land on it. */
+	.segments input {
+		position: absolute;
+		inset: 0;
+		margin: 0;
+		opacity: 0;
+		cursor: pointer;
+	}
+
 	.me {
 		position: relative;
 	}
@@ -250,7 +345,7 @@
 		position: absolute;
 		right: 0;
 		top: calc(100% + 8px);
-		min-width: 200px;
+		min-width: 260px;
 		padding: 8px;
 		display: flex;
 		flex-direction: column;
@@ -289,7 +384,7 @@
 		padding: 0 16px 20px;
 		text-align: center;
 		font-size: 11px;
-		color: #3b3a46;
+		color: light-dark(#b9b5aa, #3b3a46);
 	}
 
 	.build a {

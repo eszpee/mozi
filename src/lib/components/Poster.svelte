@@ -50,7 +50,7 @@
 		text-align: center;
 		background:
 			radial-gradient(circle at 30% 20%, rgb(245 181 68 / 0.25), transparent 55%),
-			linear-gradient(160deg, #25253a, #12121a);
+			linear-gradient(160deg, light-dark(#e8e4da, #25253a), light-dark(#d5cfc2, #12121a));
 	}
 
 	.placeholder span {

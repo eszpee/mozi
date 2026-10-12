@@ -28,27 +28,27 @@
 		font-weight: 800;
 		letter-spacing: -0.02em;
 		line-height: 1;
-		background: rgb(0 0 0 / 0.35);
+		background: light-dark(rgb(255 255 255 / 0.6), rgb(0 0 0 / 0.35));
 		flex: none;
 	}
 
 	.a0 {
-		color: #4cc36b;
+		color: light-dark(#1f9d45, #4cc36b);
 	}
 
 	.a6 {
-		color: #8fd14f;
+		color: light-dark(#5e9e1c, #8fd14f);
 	}
 
 	.a12 {
-		color: #f5c542;
+		color: light-dark(#b98a00, #f5c542);
 	}
 
 	.a16 {
-		color: #f59342;
+		color: light-dark(#d9670f, #f59342);
 	}
 
 	.a18 {
-		color: #f0524f;
+		color: light-dark(#dc2f2c, #f0524f);
 	}
 </style>

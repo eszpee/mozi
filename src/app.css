@@ -2,40 +2,51 @@
 @import '@fontsource-variable/bricolage-grotesque';
 
 :root {
-	color-scheme: dark;
+	/* Follows the device by default; the header toggle pins one scheme in data-theme.
+	   Every color token below is light-dark(light, dark), resolved by color-scheme. */
+	color-scheme: light dark;
 
-	--bg: #0b0b10;
-	--bg-raised: #14141c;
-	--bg-sunken: #08080b;
-	--surface: #1b1b25;
-	--surface-hover: #23232f;
-	--line: #2a2a38;
-	--line-strong: #3a3a4c;
+	--bg: light-dark(#f6f4ef, #0b0b10);
+	--bg-raised: light-dark(#ffffff, #14141c);
+	--bg-sunken: light-dark(#efece5, #08080b);
+	--surface: light-dark(#ebe8e1, #1b1b25);
+	--surface-hover: light-dark(#e2ded5, #23232f);
+	--line: light-dark(#dedad1, #2a2a38);
+	--line-strong: light-dark(#c9c4b8, #3a3a4c);
+	--header-bg: light-dark(rgb(246 244 239 / 0.85), rgb(11 11 16 / 0.82));
 
-	--text: #f1efe9;
-	--text-muted: #a3a1b0;
-	--text-faint: #6d6b7c;
+	--text: light-dark(#17161c, #f1efe9);
+	--text-muted: light-dark(#5c5a68, #a3a1b0);
+	--text-faint: light-dark(#8a8896, #6d6b7c);
 
-	--accent: #f5b544;
-	--accent-strong: #ffc65c;
+	--accent: light-dark(#d68d12, #f5b544);
+	--accent-strong: light-dark(#e69c20, #ffc65c);
 	--accent-ink: #1a1204;
 
-	--up: #4ade80;
-	--meh: #c9c6d6;
-	--down: #fb7185;
-	--plex: #e5a00d;
-	--info: #7dd3fc;
+	--up: light-dark(#15803d, #4ade80);
+	--meh: light-dark(#6b6878, #c9c6d6);
+	--down: light-dark(#e11d48, #fb7185);
+	--plex: light-dark(#b07a00, #e5a00d);
+	--info: light-dark(#0369a1, #7dd3fc);
 
 	--radius-s: 8px;
 	--radius: 14px;
 	--radius-l: 20px;
-	--shadow: 0 10px 30px -12px rgb(0 0 0 / 0.7);
+	--shadow: 0 10px 30px -12px light-dark(rgb(0 0 0 / 0.2), rgb(0 0 0 / 0.7));
 
 	--font-body: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
 	--font-display: 'Bricolage Grotesque Variable', var(--font-body);
 
 	--gutter: 16px;
 	--max: 1200px;
+}
+
+:root[data-theme='light'] {
+	color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+	color-scheme: dark;
 }
 
 *,
