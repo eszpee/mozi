@@ -1,0 +1,1 @@
+ALTER TABLE `availability` ADD `expected` text;

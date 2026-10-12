@@ -20,7 +20,7 @@
 			runtime: number | null;
 			rating: number | null;
 			posterPath: string | null;
-			availability: 'plex' | 'downloading' | 'requested' | null;
+			availability: 'plex' | 'downloading' | 'requested' | 'waiting' | null;
 			providers: { stream: Offer[]; rent: Offer[] };
 			tally: Tally;
 			myVote: VoteValue | null;

@@ -1,14 +1,17 @@
 <script lang="ts">
 	import { providerLogoUrl } from '#lib/ui.ts';
 
-	type Status = 'plex' | 'downloading' | 'requested';
+	type Status = 'plex' | 'downloading' | 'requested' | 'waiting';
 	let {
 		status,
+		expected = null,
 		offers = [],
 		logos = true,
 		variant = 'overlay'
 	}: {
 		status: Status | null;
+		/** First home release (YYYY-MM-DD) of a movie we're waiting for. */
+		expected?: string | null;
 		/** Where it streams or rents; any of them makes the movie available, like our own Plex. */
 		offers?: { name: string; logo: string }[];
 		/** Lists the services after the label, Plex first. */
@@ -19,7 +22,8 @@
 	const LABELS = {
 		available: { icon: '▶', text: 'Elérhető' },
 		downloading: { icon: '↓', text: 'Töltődik' },
-		requested: { icon: '⏳', text: 'Keressük' }
+		requested: { icon: '⏳', text: 'Keressük' },
+		waiting: { icon: '⏳', text: 'Várjuk' }
 	} as const;
 	const MAX_LOGOS = 3;
 
@@ -30,17 +34,35 @@
 		...(status === 'plex' ? [{ name: 'Plex', src: '/providers/plex.svg' }] : []),
 		...offers.map((p) => ({ name: p.name, src: providerLogoUrl(p.logo) }))
 	]);
+	// Release dates are midnight UTC, so they're read in UTC to keep the day.
+	let expectedText = $derived(
+		shown === 'waiting' && expected
+			? new Intl.DateTimeFormat('hu-HU', { dateStyle: 'medium', timeZone: 'UTC' }).format(
+					new Date(expected)
+				)
+			: null
+	);
+	// The movie page has room for the date; cards show it on hover.
+	let label = $derived(
+		shown && expectedText && variant === 'inline'
+			? `${LABELS[shown].text} · ${expectedText}`
+			: shown && LABELS[shown].text
+	);
 	let title = $derived(
 		shown === 'available' && services.length
 			? `${LABELS.available.text}: ${services.map((s) => s.name).join(', ')}`
-			: shown && LABELS[shown].text
+			: expectedText
+				? `Még nem jelent meg, várhatóan ${expectedText}`
+				: shown === 'waiting'
+					? 'Még nem jelent meg'
+					: shown && LABELS[shown].text
 	);
 </script>
 
 {#if shown}
 	<span class="badge {shown} {variant}" class:crowded={logos && services.length > 2} {title}>
 		<span aria-hidden="true">{LABELS[shown].icon}</span>
-		<span class="text">{LABELS[shown].text}</span>
+		<span class="text">{label}</span>
 		{#if shown === 'available' && logos && services.length}
 			<span class="logos">
 				{#each services.slice(0, MAX_LOGOS) as s (s.name)}
@@ -109,7 +131,8 @@
 		color: #04212e;
 	}
 
-	.requested {
+	.requested,
+	.waiting {
 		background: light-dark(rgb(255 255 255 / 0.9), rgb(27 27 37 / 0.9));
 		color: var(--text-muted);
 		border: 1px solid var(--line-strong);
