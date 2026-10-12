@@ -87,7 +87,6 @@
 		align-items: center;
 		gap: 3px;
 		margin-left: 2px;
-		margin-right: -5px;
 	}
 
 	.logos img {
