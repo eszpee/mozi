@@ -8,6 +8,7 @@
 	import Linkified from '#lib/components/Linkified.svelte';
 	import {
 		formatDate,
+		formatRelease,
 		formatRuntime,
 		languageName,
 		personUrl,
@@ -69,6 +70,8 @@
 		...movie.providers.stream.map(logo)
 	]);
 	let rentals = $derived(movie.providers.rent.map(logo));
+	// The digital release only matters until we can watch it: in Plex, or streaming/renting in Hungary.
+	let showDigital = $derived(streams.length === 0 && rentals.length === 0);
 </script>
 
 <svelte:head><title>{movie.title.main} · mozi</title></svelte:head>
@@ -123,6 +126,12 @@
 					</p>
 				{/if}
 			{/each}
+			{#if movie.releases.theatrical}
+				<p class="details">Bemutató: {formatRelease(movie.releases.theatrical)}</p>
+			{/if}
+			{#if showDigital && movie.releases.digital}
+				<p class="details">Digitális: {formatRelease(movie.releases.digital)}</p>
+			{/if}
 			{#each [{ label: 'Elérhető', list: streams }, { label: 'Bérelhető', list: rentals }] as row (row.label)}
 				{#if row.list.length}
 					<div class="providers">

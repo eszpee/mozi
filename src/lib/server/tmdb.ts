@@ -4,6 +4,7 @@ import type { MovieMeta, Person } from '#lib/server/db/schema.ts';
 import { FIXTURE_MOVIES } from './tmdb-fixtures.ts';
 import { parseWatchLinks, summarizeProviders, type TmdbCountryProviders } from './providers.ts';
 import { pickAgeRating } from './age-rating.ts';
+import { pickReleases, type TmdbReleaseCountry } from './release-dates.ts';
 
 const API = 'https://api.themoviedb.org/3';
 
@@ -94,9 +95,7 @@ type TmdbDetails = {
 		translations: { iso_639_1: string; data: { title?: string; overview?: string } }[];
 	};
 	images?: { posters: { file_path: string; iso_639_1: string | null }[] };
-	release_dates?: {
-		results: { iso_3166_1: string; release_dates: { certification: string }[] }[];
-	};
+	release_dates?: { results: TmdbReleaseCountry[] };
 	'watch/providers'?: { results: Record<string, TmdbCountryProviders> };
 	credits?: {
 		cast: { id: number; name: string; order: number }[];
@@ -186,7 +185,8 @@ export async function fetchMovieMeta(tmdbId: number): Promise<MovieMeta> {
 		directors,
 		cast,
 		watch: summarizeProviders(huWatch, await watchPageLinks(huWatch?.link)),
-		ageRating: pickAgeRating(d.release_dates?.results)
+		ageRating: pickAgeRating(d.release_dates?.results),
+		releases: pickReleases(d.release_dates?.results)
 	};
 }
 

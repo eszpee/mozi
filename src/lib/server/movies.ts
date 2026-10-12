@@ -8,6 +8,7 @@ import { availabilityMap } from '#lib/server/arr.ts';
 import type { AvailabilityStatus } from '#lib/server/availability.ts';
 import type { Providers } from '#lib/server/providers.ts';
 import type { AgeRating } from '#lib/server/age-rating.ts';
+import type { Releases } from '#lib/server/release-dates.ts';
 import { fetchMovieMeta } from '#lib/server/tmdb.ts';
 import { closeNightWith, openNight } from '#lib/server/nights.ts';
 
@@ -30,6 +31,7 @@ export type MovieView = {
 	cast: Person[];
 	providers: Providers;
 	ageRating: AgeRating | null;
+	releases: Releases;
 	addedAt: number;
 	addedBy: Member;
 	watchedAt: number | null;
@@ -109,6 +111,7 @@ function buildViews(rows: Movie[], meId: number, voters?: ReadonlySet<number>): 
 			cast: people(m.meta.cast),
 			providers: m.meta.watch ?? { link: null, stream: [], rent: [] },
 			ageRating: m.meta.ageRating ?? null,
+			releases: m.meta.releases ?? { theatrical: null, digital: null },
 			addedAt: m.addedAt.getTime(),
 			addedBy: member(m.addedBy),
 			watchedAt: m.watchedAt?.getTime() ?? null,
@@ -340,7 +343,7 @@ export async function refreshStaleMeta(limit = 10) {
 		.where(
 			and(
 				isNull(schema.movies.deletedAt),
-				// Stale, or cached before `releaseDate` / credits / providers / age rating existed (a JSON null means TMDB has none).
+				// Stale, or cached before `releaseDate` / credits / providers / age rating / releases existed (a JSON null means TMDB has none).
 				or(
 					sql`${schema.movies.metaRefreshedAt} < ${Date.now() - WEEK}`,
 					sql`json_type(${schema.movies.meta}, '$.releaseDate') IS NULL`,
@@ -349,7 +352,8 @@ export async function refreshStaleMeta(limit = 10) {
 					sql`json_type(${schema.movies.meta}, '$.cast[0]') = 'text'`,
 					sql`json_type(${schema.movies.meta}, '$.directors[0]') = 'text'`,
 					sql`json_type(${schema.movies.meta}, '$.watch') IS NULL`,
-					sql`json_type(${schema.movies.meta}, '$.ageRating') IS NULL`
+					sql`json_type(${schema.movies.meta}, '$.ageRating') IS NULL`,
+					sql`json_type(${schema.movies.meta}, '$.releases') IS NULL`
 				)
 			)
 		)

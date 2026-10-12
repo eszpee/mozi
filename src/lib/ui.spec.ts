@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { languageName, personUrl, providerUrl } from './ui.ts';
+import { formatRelease, languageName, personUrl, providerUrl } from './ui.ts';
 
 describe('languageName', () => {
 	it('names languages in Hungarian', () => {
@@ -54,5 +54,28 @@ describe('personUrl', () => {
 			'https://www.themoviedb.org/person/2419'
 		);
 		expect(personUrl({ tmdbId: null, imdbId: null })).toBeNull();
+	});
+});
+
+describe('formatRelease', () => {
+	it('names the countries of the first release, then Hungary’s date', () => {
+		expect(formatRelease({ date: '2026-10-03', countries: ['US', 'GB'], hu: '2026-10-16' })).toBe(
+			'2026. okt. 3. (US, GB) · 2026. okt. 16. (HU)'
+		);
+		expect(formatRelease({ date: '2026-10-03', countries: ['US'], hu: null })).toBe(
+			'2026. okt. 3. (US)'
+		);
+	});
+
+	it('is just the date when Hungary was among the first', () => {
+		expect(formatRelease({ date: '2026-10-03', countries: ['US', 'HU'], hu: null })).toBe(
+			'2026. okt. 3.'
+		);
+	});
+
+	it('shortens long country lists', () => {
+		expect(
+			formatRelease({ date: '2026-10-03', countries: ['US', 'GB', 'DE', 'FR', 'IT'], hu: null })
+		).toBe('2026. okt. 3. (US, GB, DE +2)');
 	});
 });

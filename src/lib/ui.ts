@@ -1,4 +1,5 @@
 import type { VoteValue } from './scoring.ts';
+import type { Release } from './server/release-dates.ts';
 
 export const VOTE_OPTIONS: { value: VoteValue; emoji: string; label: string }[] = [
 	{ value: 1, emoji: '👍', label: 'Megnézném' },
@@ -62,6 +63,17 @@ const dateFmt = new Intl.DateTimeFormat('hu-HU', {
 	year: 'numeric'
 });
 export const formatDate = (ms: number) => dateFmt.format(ms);
+
+// Noon, so the calendar date survives any time zone.
+const formatIsoDate = (iso: string) => formatDate(new Date(`${iso}T12:00:00`).getTime());
+
+/** "2026. okt. 3. (US, GB) · 2026. okt. 16. (HU)", or just the date when Hungary was among the first. */
+export function formatRelease(r: Release) {
+	if (r.countries.includes('HU')) return formatIsoDate(r.date);
+	const more = r.countries.length > 3 ? ` +${r.countries.length - 3}` : '';
+	const first = `${formatIsoDate(r.date)} (${r.countries.slice(0, 3).join(', ')}${more})`;
+	return r.hu ? `${first} · ${formatIsoDate(r.hu)} (HU)` : first;
+}
 
 /** "okt. 18., V", or with a `long` weekday "okt. 18., Vasárnap". */
 export function formatNightDate(iso: string | null, weekday: 'short' | 'long' = 'short') {

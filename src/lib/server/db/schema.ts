@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm';
 import type { Providers } from '#lib/server/providers.ts';
 import type { AgeRating } from '#lib/server/age-rating.ts';
+import type { Releases } from '#lib/server/release-dates.ts';
 import { index, integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 const now = sql`(unixepoch() * 1000)`;
@@ -66,6 +67,8 @@ export type MovieMeta = {
 	watch?: Providers;
 	/** Minimum age (Hungarian rating, else German). Missing on movies cached before. */
 	ageRating?: AgeRating | null;
+	/** First theatrical and digital releases. Missing on movies cached before. */
+	releases?: Releases;
 };
 
 export const movies = sqliteTable(
