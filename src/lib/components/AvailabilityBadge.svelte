@@ -1,21 +1,55 @@
 <script lang="ts">
+	import { providerLogoUrl } from '#lib/ui.ts';
+
+	type Status = 'plex' | 'downloading' | 'requested';
 	let {
 		status,
+		streams = [],
+		logos = true,
 		variant = 'overlay'
-	}: { status: 'plex' | 'downloading' | 'requested' | null; variant?: 'overlay' | 'inline' } =
-		$props();
+	}: {
+		status: Status | null;
+		/** Where it streams; any of them makes the movie available, like our own Plex. */
+		streams?: { name: string; logo: string }[];
+		/** Lists the services after the label, Plex first. */
+		logos?: boolean;
+		variant?: 'overlay' | 'inline';
+	} = $props();
 
 	const LABELS = {
-		plex: { icon: '▶', text: 'Elérhető' },
+		available: { icon: '▶', text: 'Elérhető' },
 		downloading: { icon: '↓', text: 'Töltődik' },
 		requested: { icon: '⏳', text: 'Keressük' }
 	} as const;
+	const MAX_LOGOS = 3;
+
+	let shown: keyof typeof LABELS | null = $derived(
+		status === 'plex' || streams.length ? 'available' : status
+	);
+	let services = $derived([
+		...(status === 'plex' ? [{ name: 'Plex', src: '/providers/plex.svg' }] : []),
+		...streams.map((p) => ({ name: p.name, src: providerLogoUrl(p.logo) }))
+	]);
+	let title = $derived(
+		shown === 'available' && services.length
+			? `${LABELS.available.text}: ${services.map((s) => s.name).join(', ')}`
+			: shown && LABELS[shown].text
+	);
 </script>
 
-{#if status}
-	<span class="badge {status} {variant}" title={LABELS[status].text}>
-		<span aria-hidden="true">{LABELS[status].icon}</span>
-		<span class="text">{LABELS[status].text}</span>
+{#if shown}
+	<span class="badge {shown} {variant}" class:crowded={logos && services.length > 2} {title}>
+		<span aria-hidden="true">{LABELS[shown].icon}</span>
+		<span class="text">{LABELS[shown].text}</span>
+		{#if shown === 'available' && logos && services.length}
+			<span class="logos">
+				{#each services.slice(0, MAX_LOGOS) as s (s.name)}
+					<img src={s.src} alt={s.name} width="16" height="16" loading="lazy" />
+				{/each}
+				{#if services.length > MAX_LOGOS}<span class="more">+{services.length - MAX_LOGOS}</span
+					>{/if}
+			</span>
+		{/if}
 	</span>
 {/if}
 
@@ -35,12 +69,38 @@
 		position: absolute;
 		top: 8px;
 		left: 8px;
+		max-width: calc(100% - 16px);
 		backdrop-filter: blur(8px);
 		-webkit-backdrop-filter: blur(8px);
 		box-shadow: 0 2px 10px rgb(0 0 0 / 0.4);
 	}
 
-	.plex {
+	/* On a narrow card, a long row of logos takes the label's place; the ▶ still says "available". */
+	@container (max-width: 210px) {
+		.overlay.crowded .text {
+			display: none;
+		}
+	}
+
+	.logos {
+		display: inline-flex;
+		align-items: center;
+		gap: 3px;
+		margin-left: 2px;
+		margin-right: -5px;
+	}
+
+	.logos img {
+		display: block;
+		border-radius: 4px;
+		background: rgb(0 0 0 / 0.2);
+	}
+
+	.more {
+		font-size: 11px;
+	}
+
+	.available {
 		background: rgb(229 160 13 / 0.92);
 		color: #1a1204;
 	}

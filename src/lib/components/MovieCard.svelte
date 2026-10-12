@@ -20,6 +20,7 @@
 			rating: number | null;
 			posterPath: string | null;
 			availability: 'plex' | 'downloading' | 'requested' | null;
+			providers: { stream: { name: string; logo: string }[] };
 			tally: Tally;
 			myVote: VoteValue | null;
 			seenBy: Member[];
@@ -40,7 +41,7 @@
 	<a class="link" href="/movie/{movie.id}">
 		<div class="poster-wrap">
 			<Poster path={movie.posterPath} title={movie.title.main} {eager} />
-			<AvailabilityBadge status={movie.availability} />
+			<AvailabilityBadge status={movie.availability} streams={movie.providers.stream} />
 			{#if movie.myVote === null}<span class="new" title="Még nem szavaztál">új</span>{/if}
 			<span class="added-by">
 				<Avatar
@@ -93,6 +94,7 @@
 
 	.poster-wrap {
 		position: relative;
+		container-type: inline-size;
 		margin-bottom: 8px;
 		transition: transform 0.2s;
 		box-shadow: var(--shadow);

@@ -49,7 +49,8 @@
 	let fresh = $derived.by(() => {
 		let movies = data.movies;
 		if (filters.needsVote) movies = movies.filter((m) => m.myVote === null);
-		if (filters.inPlex) movies = movies.filter((m) => m.availability === 'plex');
+		if (filters.inPlex)
+			movies = movies.filter((m) => m.availability === 'plex' || m.providers.stream.length > 0);
 		return rank(
 			movies.map((m) => ({
 				movie: m,

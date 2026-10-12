@@ -94,7 +94,12 @@
 			</span>
 		</div>
 		<div class="headline">
-			<AvailabilityBadge status={movie.availability} variant="inline" />
+			<AvailabilityBadge
+				status={movie.availability}
+				streams={movie.providers.stream}
+				logos={false}
+				variant="inline"
+			/>
 			<h1>{movie.title.main}</h1>
 			{#if movie.title.original}<p class="original">{movie.title.original}</p>{/if}
 			<div class="details-row">
