@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { pickReleases } from './release-dates.ts';
+import { RELEASES_VERSION, pickReleases } from './release-dates.ts';
 
 const country = (iso_3166_1: string, ...dates: [type: number, date: string][]) => ({
 	iso_3166_1,
@@ -30,12 +30,21 @@ describe('pickReleases', () => {
 		expect(r.theatrical).toEqual({ date: '2026-10-03', countries: ['US', 'HU'], hu: null });
 	});
 
-	it('counts limited theatrical releases but not premieres', () => {
+	it('skips premieres and limited releases when there is a regular one', () => {
 		const r = pickReleases([
-			country('FR', [1, '2026-05-20'], [2, '2026-09-01']),
-			country('US', [3, '2026-09-10'])
+			country('RO', [2, '2026-06-13'], [3, '2027-01-15']),
+			country('FR', [1, '2026-05-18'], [3, '2026-08-19']),
+			country('CH', [3, '2026-08-19'])
 		]);
-		expect(r.theatrical).toEqual({ date: '2026-09-01', countries: ['FR'], hu: null });
+		expect(r.theatrical).toEqual({ date: '2026-08-19', countries: ['FR', 'CH'], hu: null });
+	});
+
+	it('falls back to limited releases when there is no regular one', () => {
+		const r = pickReleases([
+			country('US', [1, '2026-01-20'], [2, '2026-03-06']),
+			country('GB', [2, '2026-04-10'])
+		]);
+		expect(r.theatrical).toEqual({ date: '2026-03-06', countries: ['US'], hu: null });
 	});
 
 	it('picks the first digital or physical release anywhere as the home release', () => {
@@ -49,9 +58,10 @@ describe('pickReleases', () => {
 
 	it('is null where TMDB has no date', () => {
 		expect(pickReleases([country('US', [1, '2026-05-20'])])).toEqual({
+			v: RELEASES_VERSION,
 			theatrical: null,
 			home: null
 		});
-		expect(pickReleases(undefined)).toEqual({ theatrical: null, home: null });
+		expect(pickReleases(undefined)).toEqual({ v: RELEASES_VERSION, theatrical: null, home: null });
 	});
 });

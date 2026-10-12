@@ -2,6 +2,11 @@
 export type Release = { date: string; countries: string[]; hu: string | null };
 /** `home` is the first digital or physical (Blu-ray/DVD) release anywhere, as an ISO date. */
 export type Releases = { theatrical: Release | null; home: string | null };
+/** As cached in the movie's metadata; `v` (missing before versions) says which rules made it. */
+export type CachedReleases = Releases & { v?: number };
+
+/** Bump when the picking rules change, so cached movies are picked again after the deploy. */
+export const RELEASES_VERSION = 2;
 
 export type TmdbReleaseCountry = {
 	iso_3166_1: string;
@@ -9,7 +14,8 @@ export type TmdbReleaseCountry = {
 };
 
 // TMDB release types: 1 premiere, 2 limited theatrical, 3 theatrical, 4 digital, 5 physical, 6 TV.
-const THEATRICAL = [2, 3];
+const THEATRICAL = [3];
+const LIMITED = [2];
 const HOME = [4, 5];
 
 function pick(all: TmdbReleaseCountry[], types: number[]): Release | null {
@@ -30,10 +36,14 @@ function pick(all: TmdbReleaseCountry[], types: number[]): Release | null {
 	return { date, countries, hu };
 }
 
-/** The first theatrical and home releases, from TMDB's per-country release dates. */
-export function pickReleases(countries: TmdbReleaseCountry[] | undefined): Releases {
+/**
+ * The first theatrical and home releases, from TMDB's per-country release dates.
+ * Limited releases (often festival-like screenings) count only when there's no regular one.
+ */
+export function pickReleases(countries: TmdbReleaseCountry[] | undefined): CachedReleases {
 	return {
-		theatrical: pick(countries ?? [], THEATRICAL),
+		v: RELEASES_VERSION,
+		theatrical: pick(countries ?? [], THEATRICAL) ?? pick(countries ?? [], LIMITED),
 		home: pick(countries ?? [], HOME)?.date ?? null
 	};
 }

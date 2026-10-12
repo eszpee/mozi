@@ -8,7 +8,7 @@ import { availabilityMap } from '#lib/server/arr.ts';
 import type { AvailabilityStatus } from '#lib/server/availability.ts';
 import type { Providers } from '#lib/server/providers.ts';
 import type { AgeRating } from '#lib/server/age-rating.ts';
-import type { Releases } from '#lib/server/release-dates.ts';
+import { RELEASES_VERSION, type Releases } from '#lib/server/release-dates.ts';
 import { fetchMovieMeta } from '#lib/server/tmdb.ts';
 import { closeNightWith, openNight } from '#lib/server/nights.ts';
 
@@ -343,7 +343,7 @@ export async function refreshStaleMeta(limit = 10) {
 		.where(
 			and(
 				isNull(schema.movies.deletedAt),
-				// Stale, or cached before `releaseDate` / credits / providers / age rating / home releases existed (a JSON null means TMDB has none).
+				// Stale, or cached before `releaseDate` / credits / providers / age rating existed, or with releases picked by older rules (a JSON null means TMDB has none).
 				or(
 					sql`${schema.movies.metaRefreshedAt} < ${Date.now() - WEEK}`,
 					sql`json_type(${schema.movies.meta}, '$.releaseDate') IS NULL`,
@@ -353,7 +353,7 @@ export async function refreshStaleMeta(limit = 10) {
 					sql`json_type(${schema.movies.meta}, '$.directors[0]') = 'text'`,
 					sql`json_type(${schema.movies.meta}, '$.watch') IS NULL`,
 					sql`json_type(${schema.movies.meta}, '$.ageRating') IS NULL`,
-					sql`json_type(${schema.movies.meta}, '$.releases.home') IS NULL`
+					sql`coalesce(json_extract(${schema.movies.meta}, '$.releases.v'), 0) < ${RELEASES_VERSION}`
 				)
 			)
 		)
