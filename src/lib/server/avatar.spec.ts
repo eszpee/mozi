@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { AVATAR_COUNT, avatarParts, avatarSvg } from './avatar.ts';
+import { AVATAR_COUNT, EMOJI, avatarParts, avatarSvg } from './avatar.ts';
+import glyphs from './avatar-glyphs.json' with { type: 'json' };
 
 describe('avatar', () => {
 	it('is deterministic per seed', () => {
@@ -17,5 +18,10 @@ describe('avatar', () => {
 		expect(emoji.size).toBeGreaterThan(100);
 		expect(colors.size).toBe(12);
 		expect(AVATAR_COUNT).toBeGreaterThan(1500);
+	});
+
+	it('has a drawing for every emoji, so none falls back to a font', () => {
+		expect(EMOJI.filter((e) => !(e in glyphs))).toEqual([]);
+		expect(avatarSvg('abc')).not.toContain('<text');
 	});
 });

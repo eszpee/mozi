@@ -1,6 +1,10 @@
+import glyphs from './avatar-glyphs.json' with { type: 'json' };
+
 // Simple avatars: one emoji on a colored disc, both picked from the seed.
 // Animals, food and objects rather than faces, so they read well at 24px.
-const EMOJI = [
+// The emoji are Google Noto drawings (Apache-2.0), vendored by scripts/avatar-glyphs.ts:
+// a font glyph lands off center by a different amount on every platform.
+export const EMOJI = [
 	...new Set([
 		...'🐶🐱🐭🐹🐰🦊🐻🐼🐨🐯🦁🐮🐷🐸🐵🐔🐧🐦🐤🦆🦉🦇🐺🐗🐴🦄🐝🐛🦋🐌🐞🐢🐍🦎🐙🦑🦀🐡🐠🐟🐬🐳🦈🐊🦓🦒🦔🦥🦦🦩🦜🐘🦛🐪🦘🦫',
 		...'🍎🍐🍊🍋🍌🍉🍇🍓🫐🍒🍑🥭🍍🥥🥝🍅🥑🌽🥕🥐🥨🧀🥞🧇🍔🍟🍕🌭🌮🌯🍿🍩🍪🎂🧁🍭🍫🍦🍉',
@@ -46,11 +50,11 @@ export const AVATAR_SEED = /^[A-Za-z0-9_-]{1,32}$/;
 
 export function avatarSvg(seed: string): string {
 	const { emoji, color } = avatarParts(seed);
+	const { body, size } = (glyphs as Record<string, { body: string; size: number }>)[emoji];
 	return (
 		'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">' +
 		`<circle cx="32" cy="32" r="32" fill="${color}"/>` +
-		'<text x="32" y="32.5" font-size="36" text-anchor="middle" dominant-baseline="central" ' +
-		`font-family="'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif">${emoji}</text>` +
+		`<svg x="13" y="13" width="38" height="38" viewBox="0 0 ${size} ${size}">${body}</svg>` +
 		'</svg>'
 	);
 }
