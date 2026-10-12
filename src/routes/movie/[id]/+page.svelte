@@ -9,6 +9,7 @@
 	import {
 		formatDate,
 		formatIsoDate,
+		upcomingDate,
 		formatRelease,
 		formatRuntime,
 		languageName,
@@ -73,12 +74,7 @@
 	let rentals = $derived(movie.providers.rent.map(logo));
 	// The expected home release, until it's out or we can already watch it (Plex, or streaming/renting in Hungary).
 	let expected = $derived(
-		streams.length === 0 &&
-			rentals.length === 0 &&
-			movie.releases.home &&
-			movie.releases.home > new Date().toISOString().slice(0, 10)
-			? movie.releases.home
-			: null
+		streams.length === 0 && rentals.length === 0 ? upcomingDate(movie.releases.home) : null
 	);
 </script>
 

@@ -5,7 +5,7 @@
 	import Avatar from './Avatar.svelte';
 	import type { Tally, VoteValue } from '#lib/scoring.ts';
 	import type { DisplayTitle } from '#lib/titles.ts';
-	import { formatRuntime } from '#lib/ui.ts';
+	import { formatRuntime, upcomingDate } from '#lib/ui.ts';
 
 	type Member = { id: number; nickname: string; avatarSeed: string };
 	type Offer = { name: string; logo: string };
@@ -22,6 +22,7 @@
 			posterPath: string | null;
 			availability: 'plex' | 'downloading' | 'requested' | 'waiting' | null;
 			providers: { stream: Offer[]; rent: Offer[] };
+			releases: { home: string | null };
 			tally: Tally;
 			myVote: VoteValue | null;
 			seenBy: Member[];
@@ -44,6 +45,7 @@
 			<Poster path={movie.posterPath} title={movie.title.main} {eager} />
 			<AvailabilityBadge
 				status={movie.availability}
+				expected={upcomingDate(movie.releases.home)}
 				offers={[...movie.providers.stream, ...movie.providers.rent]}
 			/>
 			{#if movie.myVote === null}<span class="new" title="Még nem szavaztál">új</span>{/if}

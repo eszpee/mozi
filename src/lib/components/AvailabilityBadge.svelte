@@ -1,14 +1,17 @@
 <script lang="ts">
-	import { providerLogoUrl } from '#lib/ui.ts';
+	import { formatIsoDate, providerLogoUrl } from '#lib/ui.ts';
 
 	type Status = 'plex' | 'downloading' | 'requested' | 'waiting';
 	let {
 		status,
+		expected = null,
 		offers = [],
 		logos = true,
 		variant = 'overlay'
 	}: {
 		status: Status | null;
+		/** Expected home release (ISO date), shown on hover while we're waiting for the movie. */
+		expected?: string | null;
 		/** Where it streams or rents; any of them makes the movie available, like our own Plex. */
 		offers?: { name: string; logo: string }[];
 		/** Lists the services after the label, Plex first. */
@@ -36,7 +39,9 @@
 		shown === 'available' && services.length
 			? `${LABELS.available.text}: ${services.map((s) => s.name).join(', ')}`
 			: shown === 'waiting'
-				? 'Még nem jelent meg'
+				? expected
+					? `Várható: ${formatIsoDate(expected)}`
+					: 'Még nem jelent meg'
 				: shown && LABELS[shown].text
 	);
 </script>

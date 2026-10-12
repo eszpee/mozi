@@ -65,6 +65,10 @@ const dateFmt = new Intl.DateTimeFormat('hu-HU', {
 export const formatDate = (ms: number) => dateFmt.format(ms);
 
 // Noon, so the calendar date survives any time zone.
+/** The ISO date if it's still ahead, else null. */
+export const upcomingDate = (iso: string | null, now = Date.now()) =>
+	iso && iso > new Date(now).toISOString().slice(0, 10) ? iso : null;
+
 export const formatIsoDate = (iso: string) => formatDate(new Date(`${iso}T12:00:00`).getTime());
 
 /** "2026. okt. 3. (US, GB) · 2026. okt. 16. (HU)", or just the date when Hungary was among the first. */

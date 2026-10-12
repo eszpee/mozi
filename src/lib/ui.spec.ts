@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatRelease, languageName, personUrl, providerUrl } from './ui.ts';
+import { formatRelease, languageName, personUrl, providerUrl, upcomingDate } from './ui.ts';
 
 describe('languageName', () => {
 	it('names languages in Hungarian', () => {
@@ -77,5 +77,16 @@ describe('formatRelease', () => {
 		expect(
 			formatRelease({ date: '2026-10-03', countries: ['US', 'GB', 'DE', 'FR', 'IT'], hu: null })
 		).toBe('2026. okt. 3. (US, GB, DE +2)');
+	});
+});
+
+describe('upcomingDate', () => {
+	const now = new Date('2026-10-12T15:00:00Z').getTime();
+
+	it('keeps dates still ahead and drops today and the past', () => {
+		expect(upcomingDate('2026-10-13', now)).toBe('2026-10-13');
+		expect(upcomingDate('2026-10-12', now)).toBeNull();
+		expect(upcomingDate('2026-09-01', now)).toBeNull();
+		expect(upcomingDate(null, now)).toBeNull();
 	});
 });
