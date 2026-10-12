@@ -161,9 +161,22 @@ test.describe.serial('movie night', () => {
 		expect((await bea.locator('article.movie h3').allTextContents())[0]).toBe('Amélie');
 	});
 
-	test('"needs my vote" lists what I have not voted on', async () => {
-		await go(admin, '/?needs-vote');
+	test('"needs my vote" lists what I have not voted on, and sticks', async () => {
+		await go(admin, '/');
+		const chip = admin.getByRole('button', { name: /Amikre még nem szavaztam/ });
+		await chip.click();
 		await expect(admin.locator('article.movie h3')).toHaveText(['Dune: Part Two', 'Saul fia']);
+		// The filter survives a reload and a round trip to a movie, without touching the URL.
+		await go(admin, '/');
+		await expect(chip).toHaveAttribute('aria-pressed', 'true');
+		await expect(admin.locator('article.movie h3')).toHaveText(['Dune: Part Two', 'Saul fia']);
+		await card(admin, 'Saul fia').getByRole('link').first().click();
+		await expect(admin.getByRole('heading', { name: 'Saul fia', level: 1 })).toBeVisible();
+		await admin.goBack();
+		await expect(admin.locator('article.movie h3')).toHaveText(['Dune: Part Two', 'Saul fia']);
+		expect(new URL(admin.url()).search).toBe('');
+		await chip.click();
+		await expect(admin.locator('article.movie h3')).toHaveCount(4);
 	});
 
 	test('next-night scope only counts attendees', async () => {
@@ -173,12 +186,15 @@ test.describe.serial('movie night', () => {
 			'aria-pressed',
 			'true'
 		);
-		await go(admin, '/?scope=night');
+		const night = admin.getByRole('button', { name: 'Csak az számít, aki jön' });
+		await night.click();
+		await expect(night).toHaveAttribute('aria-pressed', 'true');
 		// Only Peter counts now: Bea's 👎 on Amélie no longer sinks it.
 		const titles = await admin.locator('article.movie h3').allTextContents();
 		expect(titles.slice(0, 2).sort()).toEqual(['Amélie', 'Kontroll']);
 		// Peter voted on neither of the others; the better TMDB rating (Dune) goes first.
 		expect(titles.slice(2)).toEqual(['Dune: Part Two', 'Saul fia']);
+		await admin.getByRole('button', { name: 'Mindenki' }).click();
 	});
 
 	test('comments form one thread with the author’s vote', async () => {

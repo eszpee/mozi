@@ -36,12 +36,12 @@ export type MovieView = {
 	votes: { member: Member; value: VoteValue }[];
 	/** All members' votes; shown on the buttons. */
 	tally: Tally;
-	/** Votes of the ranking scope (e.g. next night's attendees); used for sorting. */
-	rankTally: Tally;
+	/** Votes of the next night's attendees; ranks the "only who's coming" view. */
+	nightTally: Tally;
 	myVote: VoteValue | null;
 	seenBy: Member[];
-	/** How many of the ranking scope's people have seen it; used by "best bet". */
-	rankSeen: number;
+	/** How many of the next night's attendees have seen it; used by "best bet". */
+	nightSeen: number;
 	mySeen: boolean;
 	commentCount: number;
 	availability: AvailabilityStatus | null;
@@ -61,7 +61,7 @@ function membersById(): Map<number, Member> {
 	);
 }
 
-/** Builds display views for movies, with votes scoped to `voters` for the tally when given. */
+/** Builds display views for movies, with `voters` (when given) scoping the night tally. */
 function buildViews(rows: Movie[], meId: number, voters?: ReadonlySet<number>): MovieView[] {
 	if (rows.length === 0) return [];
 	const ids = rows.map((m) => m.id);
@@ -114,10 +114,10 @@ function buildViews(rows: Movie[], meId: number, voters?: ReadonlySet<number>): 
 				.map((v) => ({ member: member(v.userId), value: v.value }))
 				.filter((v) => !v.member.removed),
 			tally: tally(active),
-			rankTally: tally(active, voters),
+			nightTally: tally(active, voters),
 			myVote: mv.find((v) => v.userId === meId)?.value ?? null,
 			seenBy: ms.map((s) => member(s.userId)).filter((x) => !x.removed),
-			rankSeen: ms.filter((s) => !member(s.userId).removed && (!voters || voters.has(s.userId)))
+			nightSeen: ms.filter((s) => !member(s.userId).removed && (!voters || voters.has(s.userId)))
 				.length,
 			mySeen: ms.some((s) => s.userId === meId),
 			commentCount: commentCounts.get(m.id) ?? 0,

@@ -8,23 +8,17 @@ export function load({ locals, url }) {
 	const me = locals.user!;
 	const sortParam = url.searchParams.get('sort');
 	const sort = isSortKey(sortParam) ? sortParam : 'best';
-	const scope = url.searchParams.get('scope') === 'night' ? 'night' : 'everyone';
-	const needsVote = url.searchParams.has('needs-vote');
-	const inPlex = url.searchParams.has('plex');
 
 	const night = openNight();
 	const attendees = attendeeIds(night.id);
 	// With nobody marked as attending yet, the night scope falls back to everyone.
-	const voters = scope === 'night' && attendees.size > 0 ? attendees : undefined;
+	const voters = attendees.size > 0 ? attendees : undefined;
 
-	// Filtering and ranking happen in the page, so it can keep the order stable
-	// while people vote (see stable-order.ts).
+	// Filtering, scoping and ranking happen in the page, so it can keep the order
+	// stable while people vote (see stable-order.ts) and remember the filters.
 	return {
 		movies: activeMovies(me.id, voters),
 		sort,
-		scope,
-		needsVote,
-		inPlex,
 		night: {
 			label: night.label,
 			date: night.date,

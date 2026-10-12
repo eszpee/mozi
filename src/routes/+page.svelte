@@ -6,21 +6,57 @@
 	import { refreshAll } from '$app/navigation';
 	import { SORTS, rank, type SortKey } from '#lib/scoring.ts';
 	import { stableOrder } from '#lib/stable-order.ts';
+	import { onMount } from 'svelte';
 
 	let { data } = $props();
+
+	// The filters live only on this device: kept in localStorage, never in the URL.
+	const FILTERS_KEY = 'mozi.filters';
+	let filters = $state({
+		needsVote: false,
+		inPlex: false,
+		scope: 'everyone' as 'everyone' | 'night'
+	});
+	let filtersLoaded = false;
+
+	onMount(() => {
+		try {
+			const saved = JSON.parse(localStorage.getItem(FILTERS_KEY) ?? '{}');
+			filters = {
+				needsVote: saved.needsVote === true,
+				inPlex: saved.inPlex === true,
+				scope: saved.scope === 'night' ? 'night' : 'everyone'
+			};
+		} catch {
+			// Nothing saved, or storage is blocked: start from the defaults.
+		}
+		filtersLoaded = true;
+	});
+
+	$effect(() => {
+		const json = JSON.stringify(filters);
+		if (!filtersLoaded) return;
+		try {
+			localStorage.setItem(FILTERS_KEY, json);
+		} catch {
+			// Private mode or blocked storage: the filters just don't stick.
+		}
+	});
+
+	let byNight = $derived(filters.scope === 'night');
 
 	/** The current ranking, filtered — what a fresh page load would show. */
 	let fresh = $derived.by(() => {
 		let movies = data.movies;
-		if (data.needsVote) movies = movies.filter((m) => m.myVote === null);
-		if (data.inPlex) movies = movies.filter((m) => m.availability === 'plex');
+		if (filters.needsVote) movies = movies.filter((m) => m.myVote === null);
+		if (filters.inPlex) movies = movies.filter((m) => m.availability === 'plex');
 		return rank(
 			movies.map((m) => ({
 				movie: m,
-				tally: m.rankTally,
+				tally: byNight ? m.nightTally : m.tally,
 				addedAt: m.addedAt,
 				rating: m.rating,
-				seen: m.rankSeen,
+				seen: byNight ? m.nightSeen : m.seenBy.length,
 				released: m.releaseDate ?? (m.year ? String(m.year) : null)
 			})),
 			data.sort
@@ -32,7 +68,7 @@
 	let refreshes = $state(0);
 	let refreshing = $state(false);
 	let viewKey = $derived(
-		`${data.sort}|${data.scope}|${data.needsVote}|${data.inPlex}|${refreshes}`
+		`${data.sort}|${filters.scope}|${filters.needsVote}|${filters.inPlex}|${refreshes}`
 	);
 
 	async function refresh() {
@@ -85,35 +121,27 @@
 		<div class="controls">
 			<div class="row">
 				<div class="filters">
-					<a
+					<button
 						class="chip"
-						href={withParam('needs-vote', data.needsVote ? null : '')}
-						aria-current={data.needsVote ? 'true' : undefined}
-						data-sveltekit-reset="false"
-						data-sveltekit-replacestate
+						type="button"
+						aria-pressed={filters.needsVote}
+						onclick={() => (filters.needsVote = !filters.needsVote)}
 					>
 						Amikre még nem szavaztam{#if unvoted}<span class="count">{unvoted}</span>{/if}
-					</a>
-					<a
+					</button>
+					<button
 						class="chip"
-						href={withParam('plex', data.inPlex ? null : '')}
-						aria-current={data.inPlex ? 'true' : undefined}
-						data-sveltekit-reset="false"
-						data-sveltekit-replacestate>▶ Elérhető</a
+						type="button"
+						aria-pressed={filters.inPlex}
+						onclick={() => (filters.inPlex = !filters.inPlex)}>▶ Elérhető</button
 					>
 				</div>
 				<div class="segmented" role="group" aria-label="Kinek a szavazata számít">
-					<a
-						href={withParam('scope', null)}
-						aria-current={data.scope === 'everyone' ? 'true' : undefined}
-						data-sveltekit-reset="false"
-						data-sveltekit-replacestate>Mindenki</a
+					<button type="button" aria-pressed={!byNight} onclick={() => (filters.scope = 'everyone')}
+						>Mindenki</button
 					>
-					<a
-						href={withParam('scope', 'night')}
-						aria-current={data.scope === 'night' ? 'true' : undefined}
-						data-sveltekit-reset="false"
-						data-sveltekit-replacestate>Csak az számít, aki jön</a
+					<button type="button" aria-pressed={byNight} onclick={() => (filters.scope = 'night')}
+						>Csak az számít, aki jön</button
 					>
 				</div>
 			</div>
@@ -151,7 +179,7 @@
 					</svg>
 				</button>
 			</div>
-			{#if data.scope === 'night' && data.night.attendees.length === 0}
+			{#if byNight && data.night.attendees.length === 0}
 				<p class="note">Még senki nem jelezte, hogy jön, így mindenki szavazata számít.</p>
 			{/if}
 		</div>
@@ -176,7 +204,7 @@
 		<div class="empty card">
 			<h2>Nincs találat</h2>
 			<p class="muted">
-				{data.needsVote ? 'Mindenre szavaztál. Szép!' : 'Próbálj kikapcsolni egy szűrőt.'}
+				{filters.needsVote ? 'Mindenre szavaztál. Szép!' : 'Próbálj kikapcsolni egy szűrőt.'}
 			</p>
 		</div>
 	{/if}
@@ -212,16 +240,18 @@
 		border: 1px solid var(--line);
 	}
 
-	.segmented a {
+	.segmented button {
 		padding: 6px 14px;
+		border: 0;
 		border-radius: 999px;
-		text-decoration: none;
+		background: none;
+		cursor: pointer;
 		font-size: 13.5px;
 		font-weight: 600;
 		color: var(--text-muted);
 	}
 
-	.segmented a[aria-current='true'] {
+	.segmented button[aria-pressed='true'] {
 		background: var(--accent);
 		color: var(--accent-ink);
 	}
@@ -238,13 +268,14 @@
 		padding: 6px 12px;
 		border-radius: 999px;
 		border: 1px solid var(--line-strong);
-		text-decoration: none;
+		background: none;
+		cursor: pointer;
 		font-size: 13px;
 		font-weight: 550;
 		color: var(--text-muted);
 	}
 
-	.chip[aria-current='true'] {
+	.chip[aria-pressed='true'] {
 		border-color: var(--accent);
 		color: var(--accent);
 		background: rgb(245 181 68 / 0.1);
