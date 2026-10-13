@@ -2,13 +2,14 @@
 
 A small private web app for a group of friends to collect movie recommendations,
 vote on them (👍 / 🤷 / 👎) and pick what to watch at the next movie night.
+The app is in Hungarian.
 
 SvelteKit + SQLite, one container. Sign-in with Google, membership by invite link.
 Shows whether a movie is already in the owner's Plex / Radarr.
 
 ![The movie list: next movie night, filters, sorting, votes and availability](docs/screenshot-movies.jpg)
 
-![A movie page: details, where to watch, who voted what, who has seen it, comments](docs/screenshot-movie.jpg)
+![A movie page: details, where to watch, who voted what, who has seen it, comments, in the dark theme](docs/screenshot-movie.jpg)
 
 ## Development
 

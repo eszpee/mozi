@@ -358,6 +358,8 @@ async function shoot() {
 	await settle(page);
 	await page.screenshot({ path: 'docs/screenshot-movies.jpg', quality: 85 });
 
+	// The movie page shows off the dark theme.
+	await page.emulateMedia({ colorScheme: 'dark' });
 	await page.getByRole('link', { name: 'Inception' }).first().click();
 	await page.waitForURL(/\/movie\//);
 	await settle(page);
