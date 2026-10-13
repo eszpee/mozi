@@ -6,6 +6,10 @@ vote on them (👍 / 🤷 / 👎) and pick what to watch at the next movie night
 SvelteKit + SQLite, one container. Sign-in with Google, membership by invite link.
 Shows whether a movie is already in the owner's Plex / Radarr.
 
+![The movie list: next movie night, filters, sorting, votes and availability](docs/screenshot-movies.jpg)
+
+![A movie page: details, where to watch, who voted what, who has seen it, comments](docs/screenshot-movie.jpg)
+
 ## Development
 
 ```sh
@@ -17,6 +21,7 @@ npm run dev
 - `npm run check` · `npx vitest run` · `npm run test:e2e` · `npm run lint`
 - Schema changes: edit `src/lib/server/db/schema.ts`, then `npm run db:generate`.
   Migrations run automatically at startup.
+- README screenshots: `node scripts/readme-screenshots.ts` (throwaway database, made-up members).
 
 ## Deployment
 
