@@ -143,8 +143,8 @@
 							{/each}
 						</div>
 					</fieldset>
-					{#if data.me.admin}<a href="/admin">Admin</a>
-						<a href="/admin/votes">Szavazatok</a>{/if}
+					<a href="/votes">Szavazatok</a>
+					{#if data.me.admin}<a href="/admin">Admin</a>{/if}
 					<form method="POST" action="/auth/logout">
 						<button type="submit">Kijelentkezés</button>
 					</form>

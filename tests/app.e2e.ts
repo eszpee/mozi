@@ -298,11 +298,11 @@ test.describe.serial('movie night', () => {
 		expect(await res.text()).toContain('403');
 	});
 
-	test('the vote matrix is admin-only and shows each vote', async () => {
+	test('the vote matrix is open to every member and shows each vote', async () => {
 		await go(admin, '/');
 		await admin.getByLabel('Fiókmenü').click();
 		await admin.getByRole('link', { name: 'Szavazatok' }).click();
-		await expect(admin).toHaveURL('/admin/votes');
+		await expect(admin).toHaveURL('/votes');
 		const header = await admin.locator('thead th .name').allTextContents();
 		const amelie = admin.locator('tbody tr').filter({ hasText: 'Amélie' });
 		const cells = await amelie.locator('td').allTextContents();
@@ -317,9 +317,12 @@ test.describe.serial('movie night', () => {
 
 		await go(bea, '/');
 		await bea.getByLabel('Fiókmenü').click();
-		await expect(bea.getByRole('link', { name: 'Szavazatok' })).toHaveCount(0);
-		const res = await bea.request.get('/admin/votes');
-		expect(res.status()).toBe(404);
+		await bea.getByRole('link', { name: 'Szavazatok' }).click();
+		await expect(bea).toHaveURL('/votes');
+		await expect(bea.locator('tbody tr').filter({ hasText: 'Amélie' })).toBeVisible();
+		// The old admin URL still lands on the page.
+		await go(bea, '/admin/votes');
+		await expect(bea).toHaveURL('/votes');
 	});
 
 	test('watching a movie archives it, marks attendees seen and rolls the night over', async () => {
@@ -377,7 +380,7 @@ test.describe.serial('movie night', () => {
 		await expect(row).toContainText('eltávolítva');
 
 		// A removed member's votes leave the vote matrix and its totals (Bea's 👎 on Amélie).
-		await go(admin, '/admin/votes');
+		await go(admin, '/votes');
 		await expect(admin.locator('thead th .name')).not.toContainText(['Bea']);
 		const amelie = admin.locator('tbody tr').filter({ hasText: 'Amélie' });
 		expect((await amelie.locator('td').allTextContents()).slice(-3).map((c) => c.trim())).toEqual([
@@ -395,7 +398,7 @@ test.describe.serial('movie night', () => {
 		const movie = await card(admin, 'Amélie').getByRole('link').first().getAttribute('href');
 		for (const width of [320, 375, 402, 412]) {
 			await admin.setViewportSize({ width, height: 800 });
-			for (const path of ['/', movie!, '/add', '/watched', '/night', '/admin', '/admin/votes']) {
+			for (const path of ['/', movie!, '/add', '/watched', '/night', '/admin', '/votes']) {
 				await go(admin, path);
 				// Nothing may stick out to the right, even if clipped (iOS Safari pans to it).
 				const sticking = await admin.evaluate(() => {
