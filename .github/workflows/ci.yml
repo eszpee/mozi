@@ -21,3 +21,35 @@ jobs:
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test
+
+  # Deploys only after every check above passed, then waits until the live site
+  # runs this commit, so a failed or stuck deploy fails the run (and GitHub emails).
+  deploy:
+    needs: check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    # A newer push supersedes a deploy still in progress.
+    concurrency:
+      group: deploy
+      cancel-in-progress: true
+    steps:
+      - name: Trigger the Komodo deploy
+        env:
+          SECRET: ${{ secrets.KOMODO_MOZI_WEBHOOK_SECRET }}
+        run: |
+          body='{"ref":"refs/heads/main"}'
+          sig=$(printf '%s' "$body" | openssl dgst -sha256 -hmac "$SECRET" -hex | sed 's/^.* //')
+          curl -fsS -X POST https://komodo-hooks.peterszasz.com/listener/github/stack/mozi/deploy \
+            -H 'Content-Type: application/json' -H 'X-GitHub-Event: push' \
+            -H "X-Hub-Signature-256: sha256=$sig" -d "$body"
+      - name: Wait for the new commit to go live
+        run: |
+          for i in $(seq 1 60); do
+            live=$(curl -fsS -D - -o /dev/null https://mozi.peterszasz.com/healthz 2>/dev/null \
+              | tr -d '\r' | sed -n 's/^x-commit: //Ip')
+            echo "live: ${live:-none}"
+            [ "$live" = "$GITHUB_SHA" ] && exit 0
+            sleep 15
+          done
+          echo "::error::$GITHUB_SHA is not live after 15 minutes"
+          exit 1

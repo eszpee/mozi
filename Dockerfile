@@ -8,6 +8,11 @@ COPY package.json package-lock.json .npmrc ./
 # --ignore-scripts: better-sqlite3 ships prebuilt binaries (incl. linuxmusl); no toolchain needed.
 RUN npm ci --ignore-scripts
 COPY . .
+# The commit being built, for /healthz, so CI can tell when a deploy is live.
+# Komodo's clone keeps the branch as a loose ref; without one it says "unknown".
+RUN ref=$(cat .git/HEAD 2>/dev/null); \
+    case "$ref" in "ref: "*) ref=$(cat ".git/${ref#ref: }" 2>/dev/null);; esac; \
+    echo "${ref:-unknown}" > COMMIT
 RUN npm run check \
  && npx vitest run \
  && npm run build \
@@ -24,6 +29,7 @@ ENV NODE_ENV=production \
 COPY --from=build /app/build ./build
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/drizzle ./drizzle
+COPY --from=build /app/COMMIT ./
 COPY package.json ./
 USER node
 EXPOSE 3000

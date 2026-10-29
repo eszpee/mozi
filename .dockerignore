@@ -9,3 +9,6 @@ PLAN.md
 test-results
 playwright-report
 .git
+# Just enough to read the commit being built (see the Dockerfile).
+!.git/HEAD
+!.git/refs/heads
