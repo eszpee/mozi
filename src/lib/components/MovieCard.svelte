@@ -25,6 +25,7 @@
 			releases: { home: string | null };
 			tally: Tally;
 			myVote: VoteValue | null;
+			votes: { member: Member; value: VoteValue }[];
 			seenBy: Member[];
 			commentCount: number;
 			addedBy: { nickname: string; avatarSeed: string };
@@ -62,7 +63,7 @@
 		<p class="details">{details}</p>
 	</a>
 
-	<VoteButtons movieId={movie.id} myVote={movie.myVote} tally={movie.tally} />
+	<VoteButtons movieId={movie.id} myVote={movie.myVote} tally={movie.tally} votes={movie.votes} />
 
 	{#if movie.seenBy.length || movie.commentCount}
 		<div class="foot">

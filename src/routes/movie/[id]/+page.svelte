@@ -188,6 +188,7 @@
 			movieId={movie.id}
 			myVote={movie.myVote}
 			tally={movie.tally}
+			votes={movie.votes}
 			size="large"
 			disabled={watched}
 		/>

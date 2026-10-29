@@ -7,12 +7,15 @@
 		movieId,
 		myVote,
 		tally,
+		votes = [],
 		disabled = false,
 		size = 'normal'
 	}: {
 		movieId: number;
 		myVote: VoteValue | null;
 		tally: Tally;
+		/** Who voted what; their names show on hover. */
+		votes?: { member: { nickname: string }; value: VoteValue }[];
 		disabled?: boolean;
 		size?: 'normal' | 'large';
 	} = $props();
@@ -25,6 +28,12 @@
 		const base = v === 1 ? tally.up : v === 0 ? tally.meh : tally.down;
 		if (!pending) return base;
 		return base - (myVote === v ? 1 : 0) + (pending.vote === v ? 1 : 0);
+	};
+
+	/** The voters' names, or what the button means while nobody has picked it. */
+	const hoverOf = (option: (typeof VOTE_OPTIONS)[number]) => {
+		const names = votes.filter((v) => v.value === option.value).map((v) => v.member.nickname);
+		return names.length ? names.join(', ') : option.label;
 	};
 </script>
 
@@ -51,7 +60,7 @@
 			class:mine={shown === option.value}
 			aria-pressed={shown === option.value}
 			aria-label="{option.label} ({countOf(option.value)})"
-			title={option.label}
+			title={hoverOf(option)}
 			{disabled}
 		>
 			<span class="emoji" aria-hidden="true">{option.emoji}</span>
